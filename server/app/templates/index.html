@@ -1,4 +1,10 @@
 <!doctype html>
-<a href="{{ url_for('login') }}">
+<head>
+    <title>Testing HTML</title>
+    <link rel=stylesheet type=text/css href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<a class="login" href="{{ url_for('login') }}">
     login
 </a>
+</body>
