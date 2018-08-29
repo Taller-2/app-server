@@ -4,3 +4,4 @@ pytest
 pylint
 flake8
 gunicorn
+Flask-PyMongo
