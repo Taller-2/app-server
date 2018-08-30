@@ -2,6 +2,6 @@ flask
 
 pytest
 pylint
-flake8
+-e git+https://gitlab.com/pycqa/flake8#egg=flake8
 gunicorn
 Flask-PyMongo
