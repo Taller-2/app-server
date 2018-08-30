@@ -17,9 +17,9 @@ class JSONEncoder(json.JSONEncoder):
 
 
 app = Flask(__name__)  # pylint: disable=C0103
-mongo = PyMongo(app)  # pylint: disable=C0103
 app.config['MONGO_URI'] = 'mongodb://localhost:27017/myDatabase'
 app.json_encoder = JSONEncoder
+mongo = PyMongo(app)  # pylint: disable=C0103
 
 
 @app.route('/')
