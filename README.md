@@ -1,4 +1,4 @@
-# app-server
+# app-server [![Build Status](https://travis-ci.org/Taller-2/app-server.svg?branch=master)](https://travis-ci.org/Taller-2/app-server)
 App server del TP de Taller II 2018/2
 
 ## Idea
