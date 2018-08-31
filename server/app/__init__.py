@@ -3,7 +3,7 @@ import datetime
 import json
 
 from bson.objectid import ObjectId
-from flask import Flask, request, jsonify, render_template
+from flask import Flask
 from flask_pymongo import PyMongo
 
 
@@ -16,14 +16,15 @@ class JSONEncoder(json.JSONEncoder):
             return str(o)
         return json.JSONEncoder.default(self, o)
 
+
 # create the flask object
 app = Flask(__name__)  # pylint: disable=C0103
-# add mongo url to flask config, so that flask_pymongo can use it to make connection
+""" add mongo url to flask config, so that
+flask_pymongo can use it to make connection"""
 app.config['MONGO_URI'] = os.environ.get('DB')
 mongo = PyMongo(app)  # pylint: disable=C0103
-# use the modified encoder class to handle ObjectId & datetime object while jsonifying the response.
+""" use the modified encoder class to handle ObjectId
+& datetime object while jsonifying the response """
 app.json_encoder = JSONEncoder
 
-#from app.controllers import *
-
-
+# from app.controllers import *
