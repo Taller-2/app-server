@@ -2,7 +2,7 @@
 import os
 from flask import request, jsonify
 from app import app, mongo
-from server.logger import logger
+import logger
 
 ROOT_PATH = os.environ.get('ROOT_PATH')
 LOG = logger.get_root_logger(
