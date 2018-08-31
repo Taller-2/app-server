@@ -12,14 +12,14 @@ def get_root_logger(logger_name, filename=None):
     formatter = logging.Formatter(
         '%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 
-    ch = logging.StreamHandler()
-    ch.setFormatter(formatter)
-    logger.addHandler(ch)
+    ch_ = logging.StreamHandler()
+    ch_.setFormatter(formatter)
+    logger.addHandler(ch_)
 
     if filename:
-        fh = logging.FileHandler(filename)
-        fh.setFormatter(formatter)
-        logger.addHandler(fh)
+        fh_ = logging.FileHandler(filename)
+        fh_.setFormatter(formatter)
+        logger.addHandler(fh_)
 
     return logger
 
