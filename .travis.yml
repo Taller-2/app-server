@@ -1,11 +1,14 @@
 language: python
 python:
-  - "3.6"
-
+- '3.6'
 install:
-  - pip install -r requirements.txt
-
+- pip install -r requirements.txt
 script:
-  - sh scripts/tests.sh
-  - sh scripts/flake8.sh
-  - sh scripts/pylint.sh
+- sh scripts/tests.sh
+- sh scripts/flake8.sh
+- sh scripts/pylint.sh
+deploy:
+  provider: heroku
+  app: taller2-app-server
+  api_key:
+    secure: ayzpcbgy2gNHiSJa8SarsKIukB/JdP+zrgpPyLoiQvNZRX/C1eMFQrmLx8a4egjtQXyXs5TY0QBiSSHNLfKcQo5Nb9UeuPUK5cg8j/UTMpDnpUn574jPqpLN1dqdJ46IywHJY0DTV9NQJJy2QsSAF0nUutGMUgqd19UeGR8YP3VzMeOz2F00/Dc2cADVXGilw4DAipISPU5xP+uz/71YS3NEkNGvaIVnSNszKDXPcPkHfrE77MNvrkZGPzeHtfGokyCJaioeJDgwFgRx9tgSoXM0fm+yt0ex4ToEx3NMm/khheaXYw0YQBaqbWZejYEoZXL05l4BK6zhKTXAMdpisMi2VQLROIWQLwQHE2Gd0nyVBOMZ4YemQTeLXuVyjeOqP06SaMVIjziy7RS6/fjuXph+efSrOA6kc4b1nHU+2a2ksCrCGVOEGdD9+FU3jdZar2niBiNY6rWIydIPcOa1/XSMRDD/ClMEEo0UFFhIK4fdN4t5GxtUSSbktqk+2rf+wrxlZe3bOsBT6hdWyLMmmL/YJJu1elq1joZACInZehXRbpIQ7V//Li0518UVaorrROtSFrlTgrgntyVuPDt30zHu1g/AfdVYsl1YXFqL/N/cy3eRE8dztBhjOG5DLOQgJdtbQQs3NaD7Ynz7Y2Z3y6I2A1kuvO59yTmKeg/TL2s=
