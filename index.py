@@ -24,7 +24,8 @@ PORT = os.environ.get('PORT')
 def not_found(error):
     """ error handler """
     LOG.error(error)
-    return make_response(jsonify({'error': 'Not found'}), 404)
+    # return make_response(jsonify({'error': 'Not found'}), 404)
+    return send_from_directory('template', '404.html')
 
 
 @app.route('/')
