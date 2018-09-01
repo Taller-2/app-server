@@ -1,4 +1,4 @@
 #!/usr/bin/env sh
 
-export FLASK_APP=server/app/app.py
+export FLASK_APP=index.py
 FLASK_ENV=development flask run
