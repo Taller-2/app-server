@@ -32,14 +32,14 @@ def not_found(error):
 # index rompe el codigo por dos funciones del mismo nombre
 def index2():
     """ static files serve """
-    return send_from_directory('dist', 'index.html')
+    return send_from_directory('template', 'index.html')
 
 
 @app.route('/<path:path>')
 def static_proxy(path):
     """ static folder serve """
     file_name = path.split('/')[-1]
-    dir_name = os.path.join('dist', '/'.join(path.split('/')[:-1]))
+    dir_name = os.path.join('template', '/'.join(path.split('/')[:-1]))
     return send_from_directory(dir_name, file_name)
 
 
