@@ -1,16 +1,17 @@
-''' wrapper around logging module '''
+""" wrapper around logging module """
 import os
 import logging
 
 
 def get_root_logger(logger_name, filename=None):
-    ''' get the logger object '''
+    """ get the logger object """
     logger = logging.getLogger(logger_name)
     debug = os.environ.get('ENV', 'development') == 'development'
     logger.setLevel(logging.DEBUG if debug else logging.INFO)
 
     formatter = logging.Formatter(
-        '%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+        '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    )
 
     ch_ = logging.StreamHandler()
     ch_.setFormatter(formatter)
