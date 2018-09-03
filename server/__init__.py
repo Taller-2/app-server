@@ -21,8 +21,8 @@ def create_app():
 
     mongo.init_app(app)
 
-    from .views import EXAMPLE_BP
-    from .users import MONGO_TEST
+    from server.routes.views import EXAMPLE_BP
+    from server.routes.users import MONGO_TEST
     app.register_blueprint(EXAMPLE_BP)
     app.register_blueprint(MONGO_TEST)
 
