@@ -1,4 +1,4 @@
-""" controller and routes for users """
+""" controller and views for users """
 import os
 from flask import request, jsonify
 from app import app, mongo
