@@ -1,7 +1,6 @@
 import os
 
 from flask import Flask
-from flask_pymongo import PyMongo
 
 from server.libs.mongo import JSONEncoder
 from server.logger import logger
@@ -22,18 +21,13 @@ def create_app():
 
     mongo.init_app(app)
 
-    from .views import example_bp
-    from .users import mongo_test
-    app.register_blueprint(example_bp)
-    app.register_blueprint(mongo_test)
+    from .views import EXAMPLE_BP
+    from .users import MONGO_TEST
+    app.register_blueprint(EXAMPLE_BP)
+    app.register_blueprint(MONGO_TEST)
 
-    """ use the modified encoder class to handle ObjectId
-    & datetime object while jsonifying the response """
+    # use the modified encoder class to handle ObjectId
+    # & datetime object while jsonifying the response """
     app.json_encoder = JSONEncoder
 
     return app
-
-
-if __name__ == '__main__':
-    app = create_app()
-    app.run(host='0.0.0.0', port=app.config.get('PORT', 5000))  # Run the app

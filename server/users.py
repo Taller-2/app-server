@@ -3,7 +3,7 @@ from flask import request, jsonify, Blueprint
 from server.libs.mongo import mongo
 
 
-mongo_test = Blueprint('mongo_test', __name__, url_prefix='/user')
+MONGO_TEST = Blueprint('mongo_test', __name__, url_prefix='/user')
 
 
 # mongoDB test
@@ -46,7 +46,7 @@ def user_patch(data):
     return jsonify({'ok': True, 'message': 'record updated'}), 200
 
 
-@mongo_test.route('/', methods=['GET', 'POST', 'DELETE', 'PATCH'])
+@MONGO_TEST.route('/', methods=['GET', 'POST', 'DELETE', 'PATCH'])
 def user():
     if request.method == 'GET':
         return user_get()
