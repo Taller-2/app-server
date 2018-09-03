@@ -7,8 +7,10 @@ from server.logger import logger
 
 ROOT_PATH = os.path.dirname(os.path.realpath(__file__))
 
-LOG = logger.get_root_logger(os.environ.get(
-    'ROOT_LOGGER', 'root'), filename=os.path.join(ROOT_PATH, 'output.log'))
+LOG = logger.get_root_logger(
+    os.environ.get('ROOT_LOGGER', 'root'),
+    filename=os.path.join(ROOT_PATH, 'output.log')
+)
 
 
 def create_app():
@@ -21,13 +23,13 @@ def create_app():
 
     mongo.init_app(app)
 
-    from server.routes.views import EXAMPLE_BP
+    from server.routes.root import EXAMPLE_BP
     from server.routes.users import MONGO_TEST
     app.register_blueprint(EXAMPLE_BP)
     app.register_blueprint(MONGO_TEST)
 
-    # use the modified encoder class to handle ObjectId
-    # & datetime object while jsonifying the response """
+    # use the modified encoder class to handle ObjectId and Datetime object
+    # while jsonifying the response
     app.json_encoder = JSONEncoder
 
     return app

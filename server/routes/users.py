@@ -1,12 +1,10 @@
-""" controller and views for users """
 from flask import request, jsonify, Blueprint
-from server.libs.mongo import mongo
 
+from server.libs.mongo import mongo
 
 MONGO_TEST = Blueprint('mongo_test', __name__, url_prefix='/user')
 
 
-# mongoDB test
 def user_get():
     data = mongo.db.users.find_one(request.args)
     return jsonify(data), 200
@@ -55,4 +53,4 @@ def user():
         return user_post(data)
     if request.method == 'DELETE':
         return user_delete(data)
-    return user_patch(data)  # request.method == 'PATCH'
+    return user_patch(data)
