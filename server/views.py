@@ -4,10 +4,10 @@ import json
 from flask import send_from_directory, Blueprint
 from server import LOG
 
-bp = Blueprint('example', __name__, url_prefix='/')
+example_bp = Blueprint('example', __name__, url_prefix='/')
 
 
-@bp.route('/')
+@example_bp.route('/')
 def root():
     """ static files serve """
     return json.dumps({
@@ -15,7 +15,7 @@ def root():
     })
 
 
-@bp.errorhandler(404)
+@example_bp.errorhandler(404)
 def not_found(error):
     """ error handler """
     LOG.error(error)
@@ -23,7 +23,7 @@ def not_found(error):
     return send_from_directory('template', '404.html')
 
 
-@bp.route('/<path:path>')
+@example_bp.route('/<path:path>')
 def static_proxy(path):
     """ static folder serve """
     file_name = path.split('/')[-1]

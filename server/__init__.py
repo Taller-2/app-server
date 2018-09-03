@@ -22,14 +22,11 @@ def create_app():
 
     mongo.init_app(app)
 
-    from .views import bp
+    from .views import example_bp
     from .users import mongo_test
-    app.register_blueprint(bp)
+    app.register_blueprint(example_bp)
     app.register_blueprint(mongo_test)
 
-    """ add mongo url to flask config, so that
-    flask_pymongo can use it to make connection"""
-    app.config['MONGO_URI'] = os.environ.get('DB')
     """ use the modified encoder class to handle ObjectId
     & datetime object while jsonifying the response """
     app.json_encoder = JSONEncoder
