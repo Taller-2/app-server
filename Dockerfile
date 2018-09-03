@@ -4,4 +4,4 @@ WORKDIR /usr/src/app
 EXPOSE 4000
 RUN pip install --upgrade pip
 RUN pip install -r requirements.txt
-ENTRYPOINT ["python","index.py"]
+ENTRYPOINT ["sh","scripts/wsgi.sh"]

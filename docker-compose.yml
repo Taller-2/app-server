@@ -3,12 +3,11 @@ services:
  web_dev:
   build: .
   ports:
-   - "4000:4000"
+   - 4000:4000
   volumes:
    - .:/app
   environment:
    - ENV=development
-   - PORT=4000
    - DB=mongodb://mongodb:27017/todoDev
  mongodb:
   image: mongo:latest
@@ -21,6 +20,3 @@ services:
   ports:
    - 27017:27017
   command: mongod --smallfiles --logpath=/dev/null # --quiet
-networks:
- default:
-  name: web_dev
