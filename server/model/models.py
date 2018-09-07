@@ -44,7 +44,6 @@ class User:
             return None
 
 
-
 class Message:
 
     # Class atributes
