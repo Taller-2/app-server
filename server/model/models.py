@@ -18,7 +18,8 @@ class User:
         self.password = password
         self.data = {}
 
-    def register(self, username, name, last_name, email, password, avatar):
+    @staticmethod
+    def register(username, name, last_name, email, password, avatar):
         data = {
             "id": b64encode(urandom(24)).decode('utf-8'),
             "username": username,
@@ -36,8 +37,12 @@ class User:
             return None
         if self.data["email"] != self.email:
             return None
-        if self.data["password"] != self.password:
+        a = self.data["password_hash"]
+        b = self.password
+        password_check = bcrypt.check_password_hash(a, b)
+        if not password_check:
             return None
+
 
 
 class Message:
