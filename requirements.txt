@@ -4,6 +4,7 @@ pytest
 pylint
 -e git+https://gitlab.com/pycqa/flake8#egg=flake8
 gunicorn
-Flask-PyMongo
+flask_pymongo
 pymongo==3.4.0
 requests==2.18.1
+flask-bcrypt
