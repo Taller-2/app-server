@@ -1,30 +1,25 @@
 from flask import request, jsonify, Blueprint
+from passlib.hash import md5_crypt
 
-from server.libs.mongo import mongo
+from server.model import dbQueries
 
-MONGO_TEST = Blueprint('mongo_test', __name__, url_prefix='/user')
-
-
-def user_get(col):
-    data = mongo.db[col].find_one(request.args)
-    return jsonify(data), 200
+MONGO_TEST = Blueprint('mongo_test', __name__, url_prefix='/')
+REGISTRATION = Blueprint('resgistration', __name__, url_prefix='/')
 
 
-def user_post(data, col):
-    if not all(key in data.keys() for key in ['name', 'email']):
-        return jsonify(
-            {'ok': False, 'message': 'Bad request parameters!'}
-        ), 400
-    mongo.db[col].insert_one(data)
-    return jsonify({'ok': True, 'message': 'User created successfully!'}), 200
+def user_get(args):
+    return dbQueries.get(args, "users")
 
 
-def user_delete(data, col):
+def user_post(data):
+    return dbQueries.post(data, "users")
+
+
+def user_delete(data):
     if 'email' not in data:
-        return jsonify(
-            {'ok': False, 'message': 'Bad request parameters!'}
-        ), 400
-    db_response = mongo.db[col].delete_one({'email': data['email']})
+        dicc = {'ok': False, 'message': 'Bad request parameters!'}
+        return jsonify(dicc), 400
+    db_response = dbQueries.delete(data, "users")
     if db_response.deleted_count == 1:
         response = {'ok': True, 'message': 'record deleted'}
     else:
@@ -32,25 +27,80 @@ def user_delete(data, col):
     return jsonify(response), 200
 
 
-def user_patch(data, col):
-    if not data.get('query', {}) != {}:
-        return jsonify(
-            {'ok': False, 'message': 'Bad request parameters!'}
-        ), 400
-    mongo.db[col].update_one(
-        data['query'],
-        {'$set': data.get('payload', {})}
-    )
+def user_patch(data):
+    if not dbQueries.patch(data, "users"):
+        dicc = {'ok': False, 'message': 'Bad request parameters!'}
+        return jsonify(dicc), 400
     return jsonify({'ok': True, 'message': 'record updated'}), 200
 
 
-@MONGO_TEST.route('/', methods=['GET', 'POST', 'DELETE', 'PATCH'])
+@MONGO_TEST.route('/user', methods=['GET', 'POST', 'DELETE', 'PATCH'])
 def user():
     if request.method == 'GET':
-        return user_get("users")
+        return jsonify(user_get(request.args)), 200
     data = request.get_json()
     if request.method == 'POST':
-        return user_post(data, "users")
+        return user_post(data)
     if request.method == 'DELETE':
-        return user_delete(data, "users")
-    return user_patch(data, "users")
+        return user_delete(data)
+    return user_patch(data)
+
+
+def hash_password(password):
+    return md5_crypt.using(salt_size=4).hash(password)
+
+
+def check_password(password, password_hash):
+    return md5_crypt.verify(password, password_hash)
+
+
+def authenticate(info):
+    data = user_get(info)
+    if data is None:
+        return "You have not sign up", False
+    if data["username"] != info["username"]:
+        return "Wrong username", False
+    if data["email"] != info["email"]:
+        return "Wrong email", False
+    if not check_password(info["password"], data["password_hash"]):
+        return "Wrong password", False
+    return "success authentication", True
+
+
+@REGISTRATION.route("/login", methods=['POST'])
+def login():
+    data = request.get_json()
+    atributes = ["username", "email", "password"]
+    if not all(key in data.keys() for key in atributes):
+        return "Missing atributes"
+    message, authentication = authenticate(data)
+    if not authentication:
+        return message
+    return jsonify(data), 200
+
+
+@REGISTRATION.route("/signup", methods=['POST'])
+def signup():
+    data = request.get_json()
+    atributes = [
+        "token",
+        "username",
+        "name",
+        "last_name",
+        "email",
+        "avatar",
+        "password"
+    ]
+    if not all(key in data.keys() for key in atributes):
+        return "Missing atributes"
+    if len(data.keys()) != len(atributes):
+        return "arguments should be: token, username, name, last_name, " \
+               "email, avatar, password"
+    data_db = user_get(data)
+    if data_db is None:
+        password_hash = hash_password(data["password"])
+        del data["password"]
+        data["password_hash"] = password_hash
+        user_post(data)
+        return "You have been successfully registered"
+    return "username already exist"
