@@ -1,7 +1,6 @@
 import os
 
 from flask import Flask
-from flask_bcrypt import Bcrypt
 
 from server.libs.mongo import JSONEncoder
 from server.logger import logger
@@ -18,7 +17,6 @@ def create_app():
     LOG.info('running environment: %s', os.environ.get('ENV'))
     # Debug mode if development env
     app = Flask(__name__)
-    bcrypt = Bcrypt(app)  # password hashing function
 
     app.config.from_object('config.Config')
 
@@ -38,4 +36,4 @@ def create_app():
     # while jsonifying the response
     app.json_encoder = JSONEncoder
 
-    return app, bcrypt
+    return app
