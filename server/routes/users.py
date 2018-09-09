@@ -1,25 +1,25 @@
 from flask import request, jsonify, Blueprint
 from passlib.hash import md5_crypt
 
-from server.model import dbQueries
+from server.model import crud
 
 MONGO_TEST = Blueprint('mongo_test', __name__, url_prefix='/')
 REGISTRATION = Blueprint('resgistration', __name__, url_prefix='/')
 
 
 def user_get(args):
-    return dbQueries.get(args, "users")
+    return crud.get(args, "users")
 
 
 def user_post(data):
-    return dbQueries.post(data, "users")
+    return crud.post(data, "users")
 
 
 def user_delete(data):
     if 'email' not in data:
         dicc = {'ok': False, 'message': 'Bad request parameters!'}
         return jsonify(dicc), 400
-    db_response = dbQueries.delete(data, "users")
+    db_response = crud.delete(data, "users")
     if db_response.deleted_count == 1:
         response = {'ok': True, 'message': 'record deleted'}
     else:
@@ -28,7 +28,7 @@ def user_delete(data):
 
 
 def user_patch(data):
-    if not dbQueries.patch(data, "users"):
+    if not crud.patch(data, "users"):
         dicc = {'ok': False, 'message': 'Bad request parameters!'}
         return jsonify(dicc), 400
     return jsonify({'ok': True, 'message': 'record updated'}), 200

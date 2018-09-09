@@ -27,10 +27,12 @@ def create_app():
     from server.routes.root import EXAMPLE_BP
     from server.routes.users import MONGO_TEST, REGISTRATION
     from server.routes.ping import PING_BP
+    from server.routes.articles import ARTICLES_BP
     app.register_blueprint(EXAMPLE_BP)
     app.register_blueprint(MONGO_TEST)
     app.register_blueprint(PING_BP)
     app.register_blueprint(REGISTRATION)
+    app.register_blueprint(ARTICLES_BP)
 
     # use the modified encoder class to handle ObjectId and Datetime object
     # while jsonifying the response
