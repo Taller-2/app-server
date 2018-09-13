@@ -8,3 +8,4 @@ flask_pymongo
 pymongo==3.4.0
 requests==2.18.1
 passlib[totp]
+firebase-admin
