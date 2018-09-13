@@ -1,6 +1,8 @@
 import os
 
 from flask import Flask
+import firebase_admin
+from firebase_admin import credentials
 
 from server.libs.mongo import JSONEncoder
 from server.logger import logger
@@ -11,6 +13,11 @@ LOG = logger.get_root_logger(
     os.environ.get('ROOT_LOGGER', 'root'),
     filename=os.path.join(ROOT_PATH, 'output.log')
 )
+
+
+PATH = "https://mercadolibre-dc978.firebaseio.com"
+CRED = credentials.Certificate("serviceAccountKey.json")
+firebase_admin.initialize_app(credential=CRED, options={'databaseURL': PATH})
 
 
 def create_app():
