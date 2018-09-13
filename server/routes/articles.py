@@ -1,5 +1,5 @@
 from bson.json_util import dumps
-from flask import request, Blueprint, Response, jsonify
+from flask import request, Blueprint, Response
 
 from firebase_admin import db as firebase
 from server.model import crud
