@@ -4,8 +4,7 @@ from server.libs.mongo import mongo
 
 
 def get(args, col):
-    data = mongo.db[col].find_one(args)
-    return data
+    return mongo.db[col].find_one(args)
 
 
 def post(data, col, attributes=None):
