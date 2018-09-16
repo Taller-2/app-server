@@ -17,6 +17,8 @@ script:
   - sh scripts/flake8.sh
   - sh scripts/pylint.sh
 
+after_success:
+  - coveralls
 
 deploy:
   provider: heroku

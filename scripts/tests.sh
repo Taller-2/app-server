@@ -1,3 +1,3 @@
 #!/usr/bin/env sh
 
-python -m pytest
+python -m pytest --cov=server
