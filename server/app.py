@@ -13,12 +13,12 @@ LOG = logger.get_root_logger(
 )
 
 
-def create_app():
+def create_app(conf='config.Config'):
     LOG.info('running environment: %s', os.environ.get('ENV'))
     # Debug mode if development env
     app = Flask(__name__)
 
-    app.config.from_object('config.Config')
+    app.config.from_object(conf)
 
     from server.libs.mongo import mongo
 
