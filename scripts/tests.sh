@@ -1,3 +1,3 @@
 #!/usr/bin/env sh
 
-pytest
+python -m pytest
