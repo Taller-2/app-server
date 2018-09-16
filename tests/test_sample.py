@@ -1,9 +1,28 @@
+import json
 
 
-# content of test_sample.py
-def inc(x):
-    return x + 1
+def test_with_client(client):
+    resp = client.get('/')
+    assert resp.status_code == 200
+    assert resp.json['test']
 
 
-def test_answer():
-    assert inc(3) == 4
+def test_list_articles_initially_empty(client):
+    resp = client.get('/article/')
+    assert not resp.json
+    assert isinstance(resp.json, list)
+
+
+def test_insert_article(client):
+
+    resp = client.post('/article/', data=json.dumps({
+        'price': 1,
+        'name': 'nombre',
+        'description': 'desc',
+        'available_units': 11,
+    }), content_type='application/json')
+
+    resp = client.get('/article/')
+
+    assert len(resp.json) == 1
+
