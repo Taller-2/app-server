@@ -26,3 +26,15 @@ def test_insert_article(client):
 
     assert len(resp.json) == 1
 
+
+def test_delete_article(client):
+    client.post('/article/', data=json.dumps({
+        'price': 1,
+        'name': 'nombre',
+        'description': 'desc',
+        'available_units': 11,
+    }), content_type='application/json')
+    resp = client.get('/article/')
+    count = len(resp.json)
+    client.delete('/article/' + resp.json[0]['_id']['$oid'] + '/')
+    assert len(client.get('/article/').json) == count - 1
