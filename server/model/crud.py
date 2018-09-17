@@ -1,3 +1,4 @@
+from bson.objectid import ObjectId
 from flask import jsonify
 
 from server.libs.mongo import mongo
@@ -24,7 +25,7 @@ def post(data, col, attributes=None):
 
 
 def delete(data, col):
-    db_response = mongo.db[col].delete_one({'id': data['id']})
+    db_response = mongo.db[col].delete_one({'_id': ObjectId(data['id'])})
     return db_response
 
 
