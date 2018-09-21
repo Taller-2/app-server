@@ -1,6 +1,7 @@
 from bson.json_util import dumps
 from flask import request, Blueprint, Response, jsonify
 
+from server.decorators.login_required import login_required
 from server.libs.mongo import mongo
 from server.model import crud
 
@@ -16,6 +17,7 @@ def delete_article(_id):
 
 
 @ARTICLES_BP.route('/', methods=['GET', 'POST'])
+@login_required
 def article():
     if request.method == 'GET':
         return Response(
