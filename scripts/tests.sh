@@ -1,3 +1,3 @@
 #!/usr/bin/env sh
 
-python -m pytest --cov=server SKIP_AUTH=YES
+SKIP_AUTH=YES python -m pytest --cov=server
