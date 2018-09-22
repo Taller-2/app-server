@@ -1,4 +1,3 @@
-import os
 from functools import wraps
 
 import google.auth.transport.requests
