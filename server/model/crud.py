@@ -5,8 +5,8 @@ from server.libs.mongo import mongo
 
 
 def get(args, col):
-    data = mongo.db[col].find_one(args)
-    return data
+    data = mongo.db[col].find(args)
+    return list(data)
 
 
 def post(data, col, attributes=None):
