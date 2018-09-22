@@ -1,8 +1,10 @@
 import os
+from config import Config as BaseConfig
 
-import flask
 
-
-class Config(flask.Config):
-    DEBUG = os.environ.get('ENV') == 'development'
+class Config(BaseConfig):
+    """Clase de config para tests. Hereda de la config base (en config.py), y overridea
+    los campos necesarios para correr los tests
+    """
     MONGO_URI = os.environ.get('DB', "mongodb://localhost:27017/testing")
+    SKIP_AUTH = os.environ.get('SKIP_AUTH', 'YES')
