@@ -8,7 +8,7 @@ from flask import request, g, current_app
 def login_required(func):
     @wraps(func)
     def decorated_function(*args, **kwargs):
-        if current_app.config['SKIP_AUTH'] == 'YES':
+        if current_app.config['SKIP_AUTH']:
             return func(*args, **kwargs)
         if 'HTTP_AUTHORIZATION' not in request.headers.environ:
             return 'Unauthorized', 401
