@@ -8,6 +8,7 @@ ARTICLES_BP = Blueprint('articles', __name__, url_prefix='/article')
 
 
 @ARTICLES_BP.route('/<_id>/', methods=['DELETE'])
+@login_required
 def delete_article(_id):
     deleted = crud.delete({'id': _id}, 'articles')
 
@@ -22,8 +23,8 @@ def get_article():
     return jsonify({"ok": True, "data": data}), 200
 
 
-@login_required
 @ARTICLES_BP.route('/', methods=['POST'])
+@login_required
 def post_article():
     body = request.get_json(silent=True)
 

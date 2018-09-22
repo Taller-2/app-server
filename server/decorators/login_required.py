@@ -4,6 +4,8 @@ import google.auth.transport.requests
 import google.oauth2.id_token
 from flask import request, g, current_app
 
+from server.utils import response
+
 
 def mock_user():
     return {
@@ -37,13 +39,13 @@ def login_required(func):
             g.user = mock_user()
             return func(*args, **kwargs)
         if 'HTTP_AUTHORIZATION' not in request.headers.environ:
-            return 'Unauthorized', 401
+            return response(message='Unauthorized', ok=False), 401
         claims = google.oauth2.id_token.verify_firebase_token(
             request.headers.environ['HTTP_AUTHORIZATION'],
             google.auth.transport.requests.Request()
         )
         if not claims:
-            return 'Unauthorized', 401
+            return response(message='Unauthorized', ok=False), 401
         g.user = claims
         return func(*args, **kwargs)
 
