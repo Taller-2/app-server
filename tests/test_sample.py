@@ -19,6 +19,9 @@ def test_insert_article(client):
         'name': 'nombre',
         'description': 'desc',
         'available_units': 11,
+        'latitude': 0,
+        'longitude': 0,
+        'user': 'fake_user'
     }), content_type='application/json')
     resp = client.get('/article/')
     assert len(resp.json['data']) == 1
@@ -30,6 +33,9 @@ def test_delete_article(client):
         'name': 'nombre',
         'description': 'desc',
         'available_units': 11,
+        'latitude': 0,
+        'longitude': 0,
+        'user': 'fake_user'
     }), content_type='application/json')
     resp = client.get('/article/')
     count = len(resp.json['data'])

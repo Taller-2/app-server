@@ -1,4 +1,4 @@
-from flask import request, Blueprint, jsonify
+from flask import request, Blueprint, jsonify, g
 
 from server.decorators.login_required import login_required
 from server.model import crud
@@ -31,8 +31,16 @@ def post_article():
     if not body:
         return response("Invalid or empty request body", ok=False), 400
 
+    body['user'] = g.user
+
+    # Optional fields, zero or more. If not present, init them as an empty list
+    body.setdefault('pictures', [])
+    body.setdefault('payment_methods', [])
+    body.setdefault('tags', [])
+
     return crud.post(
-        request.get_json(),
-        'articles',
-        ('name', 'description', 'available_units', 'price')
+        data=body,
+        col='articles',
+        attributes=('name', 'description', 'available_units', 'price', 'user',
+                    'latitude', 'longitude', 'pictures', 'payment_methods', 'tags')
     )
