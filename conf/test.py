@@ -1,11 +1,10 @@
 import os
-from config import Config as BaseConfig
+from conf.local import Config as BaseConfig
 
 
 class Config(BaseConfig):
-    """Clase de config para tests. Hereda de la config base (en config.py), y overridea
+    """Clase de conf para tests. Hereda de la conf base (en local.py), y overridea
     los campos necesarios para correr los tests
     """
     MONGO_URI = os.environ.get('DB', "mongodb://localhost:27017/testing")
-    SKIP_AUTH = True
 

@@ -13,7 +13,7 @@ LOG = logger.get_root_logger(
 )
 
 
-def create_app(conf='config.Config'):
+def create_app(conf='conf.local.Config'):
     LOG.info('running environment: %s', os.environ.get('ENV'))
     # Debug mode if development env
     app = Flask(__name__)
