@@ -14,16 +14,13 @@ def test_list_articles_initially_empty(client):
 
 
 def test_insert_article(client):
-
-    resp = client.post('/article/', data=json.dumps({
+    client.post('/article/', data=json.dumps({
         'price': 1,
         'name': 'nombre',
         'description': 'desc',
         'available_units': 11,
     }), content_type='application/json')
-
     resp = client.get('/article/')
-
     assert len(resp.json) == 1
 
 

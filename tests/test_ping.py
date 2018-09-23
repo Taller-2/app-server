@@ -1,4 +1,3 @@
-
 def test_ping(client):
     resp = client.get('/ping')
 
