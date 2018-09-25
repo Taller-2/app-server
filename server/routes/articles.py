@@ -14,7 +14,8 @@ def delete_article(_id):
 
     if not deleted.deleted_count:
         return response(message=f"Article {_id} not found", ok=False), 400
-    return response(message=f"Successfully deleted article {_id}", ok=True), 200
+    return response(message=f"Successfully deleted article {_id}",
+                    ok=True), 200
 
 
 @ARTICLES_BP.route('/', methods=['GET'])
@@ -41,6 +42,7 @@ def post_article():
     return crud.post(
         data=body,
         col='articles',
-        attributes=('name', 'description', 'available_units', 'price', 'user',
-                    'latitude', 'longitude', 'pictures', 'payment_methods', 'tags')
+        attributes=('name', 'description', 'available_units', 'price',
+                    'user', 'latitude', 'longitude', 'pictures',
+                    'payment_methods', 'tags')
     )
