@@ -31,7 +31,7 @@ def post_article():
     if not body:
         return response("Invalid or empty request body", ok=False), 400
 
-    body['user'] = g.user
+    body['user'] = g.user['user_id']
 
     # Optional fields, zero or more. If not present, init them as an empty list
     body.setdefault('pictures', [])
