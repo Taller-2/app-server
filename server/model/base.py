@@ -5,9 +5,11 @@ from server.libs.mongo import mongo
 
 
 class Model:
-
+    # Schema to validate the documents against. Keys: field names
+    # values: types to validate against (use Python's typing module)
     schema = {}
 
+    # Mongodb database name. Try keeping this unique between models!
     db_name = None
 
     def __init__(self, json: dict):
@@ -78,6 +80,7 @@ class Model:
 
     def save(self):
         result = mongo.db[self.db_name].insert_one(self._data)
+        self._id = result.inserted_id
         return str(result.inserted_id)
 
     def valid_keys(self):
