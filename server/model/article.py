@@ -1,4 +1,5 @@
-from typing import Optional, Union
+from numbers import Real
+from typing import Optional
 from server.model.base import Model
 
 
@@ -9,10 +10,10 @@ class Article(Model):
         'name': str,
         'description': str,
         'available_units': int,
-        'price': Union[int, float],
+        'price': Real,
         'user': str,
-        'latitude': Union[int, float],
-        'longitude': Union[int, float],
+        'latitude': Real,
+        'longitude': Real,
         'pictures': Optional[list],
         'payment_methods': Optional[list],
         'tags': Optional[list]
