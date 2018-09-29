@@ -47,6 +47,7 @@ class Model:
 
     @classmethod
     def get_one(cls, _id):
+        validate_mongo_object_id(_id)
         doc = mongo.db[cls.db_name].find_one({'_id': ObjectId(_id)})
         if doc:
             model = cls(doc)
@@ -116,3 +117,22 @@ def validate_type(field_name: str, value: typing.Any, expected_type):
     else:
         if not isinstance(value, expected_type):
             throw_bad_type(field_name, expected_type, type(value))
+
+
+def throw_bad_id(_id: str):
+    raise ValueError(f'{_id} is not a valid Model ID. '
+                     f'It must be a 24 byte hexadecimal string')
+
+
+def validate_mongo_object_id(_id: str):
+    # https://docs.mongodb.com/manual/reference/method/ObjectId/#ObjectId
+    # 12 byte object id == 24 byte hex string
+    if not isinstance(_id, str):
+        throw_bad_id(_id)
+    if len(_id) != 24:
+        throw_bad_id(_id)
+
+    try:
+        int(_id, base=16)
+    except ValueError:
+        throw_bad_id(_id)
