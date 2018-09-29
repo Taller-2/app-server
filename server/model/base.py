@@ -96,8 +96,8 @@ def throw_bad_type_union(field, union, got_type):
 
 
 def throw_bad_type(field, expected_type, got_type):
-    type_name = \
-        got_type.__name__ if got_type is not type(None) else "null"  # noqa: E721
+    type_name = got_type.__name__ \
+            if got_type is not type(None) else "null"  # noqa: E721
 
     raise ValueError(f"Bad type for field '{field}'. "
                      f"Expected {expected_type.__name__}, "
