@@ -1,9 +1,6 @@
 import json
 from unittest import mock
 
-import pytest
-from flask import g
-
 
 def test_with_client(client):
     resp = client.get('/')

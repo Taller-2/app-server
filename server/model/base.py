@@ -15,7 +15,8 @@ class Model:
     def __init__(self, json: dict):
         self.validate(json)
         self._data = json.copy()
-        for key in filter(lambda x: x not in self.valid_keys(), json.keys()):
+        for key in filter(lambda x: x not in self.valid_keys(),
+                          list(json.keys())):
             json.pop(key)
 
         self._id = None
