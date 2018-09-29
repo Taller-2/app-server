@@ -1,4 +1,3 @@
-from bson import ObjectId
 from flask import request, Blueprint, jsonify
 
 from server.decorators.login_required import login_required
@@ -19,17 +18,16 @@ def delete_article(_id):
                                 f'It must be a 24 byte hexadecimal string',
                         ok=False), 400
 
-    article = crud.get({'_id': ObjectId(_id)}, 'articles')
+    article = Article.get_one(_id)
 
     if not article:
         return response(message=f"Article {_id} not found", ok=False), 400
 
-    article = article[0]
-    if article.get('user') != get_user()['user_id']:
+    if article['user'] != get_user()['user_id']:
         return response(message=f"User {get_user()['user_id']} is not the "
                                 f"owner of article {_id}", ok=False), 401
 
-    deleted = crud.delete({'id': _id}, 'articles')
+    deleted = article.delete()
     if not deleted.deleted_count:
         return response(message=f"Error deleting article", ok=False), 500
     return response(message=f"Successfully deleted article {_id}",
