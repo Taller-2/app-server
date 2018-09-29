@@ -1,7 +1,10 @@
-from flask import request, Blueprint, jsonify, g
+from bson import ObjectId
+from flask import request, Blueprint, jsonify
 
 from server.decorators.login_required import login_required
+from server.libs.mongo import validate_object_id
 from server.model import crud
+from server.model.user import get_user
 from server.utils import response
 
 ARTICLES_BP = Blueprint('articles', __name__, url_prefix='/article')
@@ -10,10 +13,24 @@ ARTICLES_BP = Blueprint('articles', __name__, url_prefix='/article')
 @ARTICLES_BP.route('/<_id>/', methods=['DELETE'])
 @login_required
 def delete_article(_id):
-    deleted = crud.delete({'id': _id}, 'articles')
+    if not validate_object_id(_id):
+        return response(message=f'{_id} is not a valid Article ID. '
+                                f'It must be a 24 byte hexadecimal string',
+                        ok=False), 400
 
-    if not deleted.deleted_count:
+    article = crud.get({'_id': ObjectId(_id)}, 'articles')
+
+    if not article:
         return response(message=f"Article {_id} not found", ok=False), 400
+
+    article = article[0]
+    if article.get('user') != get_user()['user_id']:
+        return response(message=f"User {get_user()['user_id']} is not the "
+                                f"owner of article {_id}", ok=False), 401
+
+    deleted = crud.delete({'id': _id}, 'articles')
+    if not deleted.deleted_count:
+        return response(message=f"Error deleting article", ok=False), 500
     return response(message=f"Successfully deleted article {_id}",
                     ok=True), 200
 
@@ -32,7 +49,7 @@ def post_article():
     if not body:
         return response("Invalid or empty request body", ok=False), 400
 
-    body['user'] = g.user['user_id']
+    body['user'] = get_user()['user_id']
 
     # Optional fields, zero or more. If not present, init them as an empty list
     body.setdefault('pictures', [])
