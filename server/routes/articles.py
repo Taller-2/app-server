@@ -1,10 +1,9 @@
 from flask import request, Blueprint, jsonify
 
 from server.decorators.login_required import login_required
-from server.libs.mongo import validate_object_id
 from server.model.article import Article
 from server.model.user import get_user
-from server.utils import response
+from server.utils import response, validate_mongo_object_id
 
 ARTICLES_BP = Blueprint('articles', __name__, url_prefix='/article')
 
@@ -12,7 +11,7 @@ ARTICLES_BP = Blueprint('articles', __name__, url_prefix='/article')
 @ARTICLES_BP.route('/<_id>/', methods=['DELETE'])
 @login_required
 def delete_article(_id):
-    if not validate_object_id(_id):
+    if not validate_mongo_object_id(_id):
         return response(message=f'{_id} is not a valid Article ID. '
                                 f'It must be a 24 byte hexadecimal string',
                         ok=False), 400
