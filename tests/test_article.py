@@ -55,7 +55,7 @@ def test_delete_article_unauthorized(client):
     }), content_type='application/json')
     resp = client.get('/article/')
     uri = '/article/' + resp.json['data'][0]['_id'] + '/'
-    with mock.patch('server.routes.articles.get_user') as fake_user:
+    with mock.patch('server.routes.articles.user') as fake_user:
         fake_user.return_value = {'user_id': 'other_user'}
         resp = client.delete(uri)
     assert resp.status_code == 401

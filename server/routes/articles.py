@@ -2,7 +2,7 @@ from flask import request, Blueprint, jsonify
 
 from server.decorators.login_required import login_required
 from server.model.article import Article
-from server.model.user import get_user
+from server.model.user import user
 from server.utils import response, validate_mongo_object_id
 
 ARTICLES_BP = Blueprint('articles', __name__, url_prefix='/article')
@@ -21,8 +21,8 @@ def delete_article(_id):
     if not article:
         return response(message=f"Article {_id} not found", ok=False), 400
 
-    if article['user'] != get_user()['user_id']:
-        return response(message=f"User {get_user()['user_id']} is not the "
+    if article['user'] != user()['user_id']:
+        return response(message=f"User {user()['user_id']} is not the "
                                 f"owner of article {_id}", ok=False), 401
 
     deleted = article.delete()
@@ -47,7 +47,7 @@ def post_article():
     if not body:
         return response("Invalid or empty request body", ok=False), 400
 
-    body['user'] = get_user()['user_id']
+    body['user'] = user()['user_id']
 
     # Optional fields, zero or more. If not present, init them as an empty list
     body.setdefault('pictures', [])
