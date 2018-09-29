@@ -9,7 +9,7 @@ class Model:
     # values: types to validate against (use Python's typing module)
     schema = {}
 
-    # Mongodb database name. Try keeping this unique between models!
+    # Mongodb database name. Try to keep this unique between models!
     db_name = None
 
     def __init__(self, json: dict):
