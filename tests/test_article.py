@@ -101,3 +101,8 @@ def test_post_article_invalid_schema_in_optional_field(client):
     }), content_type='application/json')
 
     assert resp.status_code == 400
+
+
+def test_post_article_empty_body(client):
+    resp = client.post('/article/')
+    assert resp.status_code == 400

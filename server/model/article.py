@@ -7,7 +7,7 @@ from server.libs.mongo import mongo
 
 
 class Article:
-    SCHEMA = {
+    schema = {
         'name': str,
         'description': str,
         'available_units': int,
@@ -20,11 +20,16 @@ class Article:
         'tags': Optional[list]
     }
 
+    valid_keys = list(schema) + ['_id']
+
     db_name = 'articles'
 
     def __init__(self, json: dict):
         self.validate(json)
         self._data = json.copy()
+        for key in filter(lambda x: x not in self.valid_keys, json.keys()):
+            json.pop(key)
+
         self._id = None
 
     def __getitem__(self, item):
@@ -35,19 +40,19 @@ class Article:
     def __setitem__(self, field, value):
         self.validate_key_in_schema(field)
 
-        expected_type = self.SCHEMA[field]
+        expected_type = self.schema[field]
         validate_type(field, value, expected_type)
 
         self._data[field] = value
 
     def validate_key_in_schema(self, field):
-        if field not in self.SCHEMA.keys():
+        if field not in self.schema.keys():
             name = self.__class__.__name__
             raise KeyError(f"{field} is not a valid attribute of {name}")
 
     @classmethod
     def validate(cls, json):
-        for field, expected_type in cls.SCHEMA.items():
+        for field, expected_type in cls.schema.items():
             value = json.get(field)
             validate_type(field, value, expected_type)
 
@@ -68,9 +73,30 @@ class Article:
 
         return mongo.db[self.db_name].delete_one({'_id': self._id})
 
+    @classmethod
+    def get_many(cls, *_, **kwargs):
+        models = []
+        results = mongo.db[cls.db_name].find(kwargs)
+
+        for result in results:
+            model = cls(result)
+            model._id = result['_id']
+            models.append(model)
+
+        return models
+
+    def to_json(self):
+        data = self._data.copy()
+        data.update({'_id': self._id})
+        return data
+
+    def save(self):
+        result = mongo.db[self.db_name].insert_one(self._data)
+        return str(result.inserted_id)
+
 
 def throw_bad_type_union(field, union, got_type):
-    types = "or ".join([t.__name__ for t in union.__args__])
+    types = " or ".join([t.__name__ for t in union.__args__])
     raise ValueError(f"Bad type for field {field}. "
                      f"Expected {types}, "
                      f"got {got_type.__name__}")
