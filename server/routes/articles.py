@@ -4,6 +4,7 @@ from flask import request, Blueprint, jsonify
 from server.decorators.login_required import login_required
 from server.libs.mongo import validate_object_id
 from server.model import crud
+from server.model.article import Article
 from server.model.user import get_user
 from server.utils import response
 
@@ -56,8 +57,12 @@ def post_article():
     body.setdefault('payment_methods', [])
     body.setdefault('tags', [])
 
+    try:
+        article = Article(body)
+    except ValueError as e:
+        return response(message=f"Error in validation: {e}", ok=False), 400
     return crud.post(
-        data=body,
+        data=article,
         col='articles',
         attributes=('name', 'description', 'available_units', 'price',
                     'user', 'latitude', 'longitude', 'pictures',

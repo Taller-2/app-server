@@ -1,5 +1,7 @@
 import json
 from unittest import mock
+
+import pytest
 from flask import g
 
 
@@ -71,4 +73,31 @@ def test_delete_article_wrong_id(client):
 def test_delete_article_invalid_id(client):
     bad_id = "not hex wrong len"
     resp = client.delete(f'/article/{bad_id}/')
+    assert resp.status_code == 400
+
+
+def test_post_article_invalid_schema(client):
+    resp = client.post('/article/', data=json.dumps({
+        'price': 1,
+        'name': 'nombre',
+        'description': 1,  # Bad type, should be str
+        'available_units': 11,
+        'latitude': 0,
+        'longitude': 0,
+    }), content_type='application/json')
+
+    assert resp.status_code == 400
+
+
+def test_post_article_invalid_schema_in_optional_field(client):
+    resp = client.post('/article/', data=json.dumps({
+        'price': 1,
+        'name': 'nombre',
+        'description': "desc",  # Bad type, should be str
+        'available_units': 11,
+        'latitude': 0,
+        'longitude': 0,
+        'tags': "this one has to be a list, but its a string!"
+    }), content_type='application/json')
+
     assert resp.status_code == 400
