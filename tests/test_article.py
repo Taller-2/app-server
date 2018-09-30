@@ -90,7 +90,7 @@ def test_post_article_invalid_schema_in_optional_field(client):
     resp = client.post('/article/', data=json.dumps({
         'price': 1,
         'name': 'nombre',
-        'description': "desc",  # Bad type, should be str
+        'description': "desc",
         'available_units': 11,
         'latitude': 0,
         'longitude': 0,
@@ -103,3 +103,87 @@ def test_post_article_invalid_schema_in_optional_field(client):
 def test_post_article_empty_body(client):
     resp = client.post('/article/')
     assert resp.status_code == 400
+
+
+def test_article_filter(client):
+    client.post('/article/', data=json.dumps({
+        'price': 1,
+        'name': 'nombre',
+        'description': "desc",
+        'available_units': 11,
+        'latitude': 0,
+        'longitude': 0,
+    }), content_type='application/json')
+
+    client.post('/article/', data=json.dumps({
+        'price': 1,
+        'name': 'second_name',
+        'description': "desc",
+        'available_units': 11,
+        'latitude': 0,
+        'longitude': 0,
+    }), content_type='application/json')
+
+    resp = client.get('/article/?name=second_name')
+
+    assert len(resp.json['data']) == 1
+    assert resp.json['data'][0]['name'] == 'second_name'
+
+
+def test_article_filter_bad_param(client):
+    resp = client.get('/article/?param_not_in_schema=second_name')
+    assert resp.status_code, 400
+
+
+def test_article_filter_empty_param(client):
+    resp = client.get('/article/?name')
+    assert resp.status_code, 400
+
+
+def test_article_filter_or(client):
+    client.post('/article/', data=json.dumps({
+        'price': 1,
+        'name': 'nombre',
+        'description': "desc",
+        'available_units': 11,
+        'latitude': 0,
+        'longitude': 0,
+    }), content_type='application/json')
+
+    client.post('/article/', data=json.dumps({
+        'price': 1,
+        'name': 'second_name',
+        'description': "desc",
+        'available_units': 11,
+        'latitude': 0,
+        'longitude': 0,
+    }), content_type='application/json')
+
+    resp = client.get('/article/?name=second_name&name=nombre')
+
+    assert len(resp.json['data']) == 2
+
+
+def test_article_filter_and(client):
+    client.post('/article/', data=json.dumps({
+        'price': 1,
+        'name': 'nombre',
+        'description': "desc",
+        'available_units': 11,
+        'latitude': 0,
+        'longitude': 0,
+    }), content_type='application/json')
+
+    client.post('/article/', data=json.dumps({
+        'price': 1,
+        'name': 'second_name',
+        'description': "desc",
+        'available_units': 11,
+        'latitude': 0,
+        'longitude': 0,
+    }), content_type='application/json')
+
+    resp = client.get('/article/?name=second_name&price=1')
+
+    assert len(resp.json['data']) == 1
+    assert resp.json['data'][0]['name'] == 'second_name'

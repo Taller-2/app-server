@@ -65,8 +65,11 @@ class Model:
 
     @classmethod
     def get_many(cls, *_, **kwargs):
+        mongo_query = cls.make_mongo_query(kwargs)
+
         models = []
-        results = mongo.db[cls.db_name].find(kwargs)
+        print(mongo_query)
+        results = mongo.db[cls.db_name].find(mongo_query)
 
         for result in results:
             model = cls(result)
@@ -74,6 +77,34 @@ class Model:
             models.append(model)
 
         return models
+
+    @classmethod
+    def make_mongo_query(cls, filters: dict) -> dict:
+        """
+
+        Generates an AND of several ORs of the params given by the
+        filters dict
+        filters schema: {
+            "param1": ["value1", "value2", ...]
+            "param2": ["value3", ...]
+        }
+        """
+        ands = []
+        for key in filters:
+            key_or = []
+            if isinstance(filters[key], str):
+                filters[key] = [filters[key]]
+
+            for value in filters[key]:
+                try:
+                    value = cls.schema[key](value)
+                except ValueError as e:
+                    raise ValueError(f'Error in query parameter {key}: {e}')
+                key_or.append({key: value})
+
+            if key_or:
+                ands.append({"$or": key_or})
+        return {"$and": ands} if ands else {}
 
     def to_json(self):
         data = self._data.copy()
@@ -116,6 +147,9 @@ def validate_type(field_name: str, value: typing.Any, expected_type):
             throw_bad_type_union(field_name, expected_type, type(value))
     else:
         if not isinstance(value, expected_type):
+            # Special case
+            if expected_type == float and isinstance(value, int):
+                return
             throw_bad_type(field_name, expected_type, type(value))
 
 

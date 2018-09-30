@@ -32,7 +32,18 @@ def delete_article(_id):
 
 @ARTICLES_BP.route('/', methods=['GET'])
 def get_article():
-    articles = Article.get_many(**request.args)
+    try:
+        articles = Article.get_many(**request.args)
+    except ValueError:
+        received = request.query_string.decode('utf-8')
+        return response(message=f"Error parsing querystring parameters. "
+                                f"Received '{received}'",
+                        ok=False), 400
+    except KeyError as e:
+        keys = ', '.join(Article.schema.keys())
+        return response(message=f"Invalid key {e}. "
+                                f"Valid parameters are {keys}",
+                        ok=False), 400
     data = [article.to_json() for article in articles]
     return jsonify({"ok": True, "data": data}), 200
 

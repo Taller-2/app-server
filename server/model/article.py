@@ -1,4 +1,3 @@
-from numbers import Real
 from typing import Optional
 from server.model.base import Model
 
@@ -10,10 +9,10 @@ class Article(Model):
         'name': str,
         'description': str,
         'available_units': int,
-        'price': Real,
+        'price': float,
         'user': str,
-        'latitude': Real,
-        'longitude': Real,
+        'latitude': float,
+        'longitude': float,
         'pictures': Optional[list],
         'payment_methods': Optional[list],
         'tags': Optional[list]
