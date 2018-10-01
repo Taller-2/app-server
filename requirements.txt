@@ -1,6 +1,5 @@
 google
 flask
-
 pytest
 pylint
 -e git+https://gitlab.com/pycqa/flake8#egg=flake8
@@ -13,3 +12,4 @@ python-coveralls
 coverage
 pytest-cov
 google-auth
+flask-cors==3.0.6
