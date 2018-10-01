@@ -68,3 +68,13 @@ def test_delete_model():
 
     model.delete()
     assert len(TestModel.get_many()) == 0
+
+
+def test_get_filters():
+    TestModel({"test_field": "hola"}).save()
+    TestModel({"test_field": "chau"}).save()
+
+    models = TestModel.get_many(test_field="hola")
+
+    assert len(models) == 1
+    assert models[0]["test_field"] == "hola"
