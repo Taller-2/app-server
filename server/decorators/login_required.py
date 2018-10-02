@@ -4,39 +4,35 @@ import google.auth.transport.requests
 import google.oauth2.id_token
 from flask import request, g, current_app
 
+from server.model.account import Account
 from server.utils import response
 
 
-def mock_user():
-    return {
-        'iss': 'https://securetoken.google.com/mercadolibre-dc978',
-        'name': 'Dylan Alvarez',
-        'picture': 'https://lh4.googleusercontent.com/-i-yd7LDlh7U/'
-                   'AAAAAAAAAAI/AAAAAAAAAAA/'
-                   'APUIFaPCd40UPy-1JlSIBtcTPbFP888F5g/s96-c/photo.jpg',
-        'aud': 'mercadolibre-dc978',
-        'auth_time': 1537142814,
-        'user_id': 'efUoF0bC3lUn4BbzzjKSSz3FkcF2',
-        'sub': 'efUoF0bC3lUn4BbzzjKSSz3FkcF2',
-        'iat': 1537733796,
-        'exp': 1537737396,
+def mock_user_id() -> str:
+    return 'efUoF0bC3lUn4BbzzjKSSz3FkcF2'  # dylanalvarez1995@gmail.com
+
+
+def get_or_create_account(claims):
+    if Account.get_many({'user_id': g.user_id}):
+        return
+    default_attrs = ['user_id', 'email', 'name']
+    Account({attr: claims[attr] for attr in default_attrs}).save()
+
+
+def get_or_create_mock_account():
+    g.user_id = mock_user_id()
+    get_or_create_account({
+        'user_id': g.user_id,
         'email': 'dylanalvarez1995@gmail.com',
-        'email_verified': True,
-        'firebase': {
-            'identities': {
-                'google.com': ['108899007745708697393'],
-                'email': ['dylanalvarez1995@gmail.com']
-            },
-            'sign_in_provider': 'google.com'
-        }
-    }
+        'name': 'Dylan Alvarez'
+    })
 
 
 def login_required(func):
     @wraps(func)
     def decorated_function(*args, **kwargs):
         if current_app.config['SKIP_AUTH']:
-            g.user = mock_user()
+            get_or_create_mock_account()
             return func(*args, **kwargs)
         if 'HTTP_AUTHORIZATION' not in request.headers.environ:
             return response(message='Unauthorized', ok=False), 401
@@ -45,8 +41,10 @@ def login_required(func):
             google.auth.transport.requests.Request()
         )
         if not claims:
+            g.user_id = None
             return response(message='Unauthorized', ok=False), 401
-        g.user = claims
+        g.user_id = claims['user_id']
+        get_or_create_account(claims)
         return func(*args, **kwargs)
 
     return decorated_function

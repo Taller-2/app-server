@@ -1,4 +1,4 @@
 def test_account(client):
-    keys = ['user_id', 'email', 'name']
+    keys = ['user_id', 'email', 'name', '_id']
     resp = client.get('/account/current/')
-    assert all(key in resp.json for key in keys)
+    assert all(key in resp.json['data'] for key in keys)

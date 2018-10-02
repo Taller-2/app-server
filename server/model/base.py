@@ -64,11 +64,10 @@ class Model:
         return mongo.db[self.db_name].delete_one({'_id': self._id})
 
     @classmethod
-    def get_many(cls, *_, **kwargs):
+    def get_many(cls, *_, **kwargs) -> list:
         mongo_query = cls.make_mongo_query(kwargs)
 
         models = []
-        print(mongo_query)
         results = mongo.db[cls.db_name].find(mongo_query)
 
         for result in results:
