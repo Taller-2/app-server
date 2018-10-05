@@ -13,7 +13,7 @@ def mock_user_id() -> str:
 
 
 def get_or_create_account(claims):
-    if Account.get_many({'user_id': g.user_id}):
+    if Account.get_many(user_id=claims['user_id']):
         return
     default_attrs = ['user_id', 'email', 'name']
     Account({attr: claims[attr] for attr in default_attrs}).save()

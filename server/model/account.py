@@ -13,4 +13,4 @@ class Account(Model):
 
     @classmethod
     def current(cls):
-        return cls.get_many({'user_id': user_id()})[0]
+        return cls.get_many(user_id=user_id())[0]
