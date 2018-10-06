@@ -121,6 +121,18 @@ class Model:
     def valid_keys(self):
         return list(self.schema) + ['_id']
 
+    def update(self, **values):
+        if values.get('_id'):
+            values.pop('_id')
+
+        for key in values:
+            self[key] = values[key]
+
+        return self.save()
+
+    def get_id(self):
+        return str(self._id)
+
 
 def throw_bad_type_union(field, union, got_type):
     types = " or ".join([t.__name__ for t in union.__args__])
