@@ -111,12 +111,27 @@ class Model:
         return data
 
     def save(self):
-        result = mongo.db[self.db_name].insert_one(self._data)
-        self._id = result.inserted_id
-        return str(result.inserted_id)
+        collection = mongo.db[self.db_name]
+        if self._id:
+            collection.update({'_id': self._id}, {"$set": self._data})
+        else:
+            self._id = collection.insert_one(self._data).inserted_id
+        return str(self._id)
 
     def valid_keys(self):
         return list(self.schema) + ['_id']
+
+    def update(self, **values):
+        if values.get('_id'):
+            values.pop('_id')
+
+        for key in values:
+            self[key] = values[key]
+
+        return self.save()
+
+    def get_id(self):
+        return str(self._id)
 
 
 def throw_bad_type_union(field, union, got_type):

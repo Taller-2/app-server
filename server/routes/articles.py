@@ -68,5 +68,30 @@ def post_article():
     except ValueError as e:
         return response(message=f"Error in validation: {e}", ok=False), 400
 
-    article.save()
-    return response(message=f"Successfully created new article!", ok=True)
+    _id = article.save()
+    return jsonify({"ok": True, "_id": _id}), 200
+
+
+@ARTICLES_BP.route('/', methods=['PATCH'])
+@login_required
+def put_article():
+    body = request.get_json(silent=True)
+
+    if not body:
+        return response("Invalid or empty request body", ok=False), 400
+
+    _id = body.get('_id')
+    if _id is None:
+        return response("_id field invalid", ok=False), 400
+
+    try:
+        article = Article.get_one(_id)
+    except ValueError:
+        return response(f'Bad article id: {_id}', ok=False), 400
+
+    try:
+        article.update(**body)
+    except ValueError as e:
+        return response(message=f"Error in validation: {e}", ok=False), 400
+
+    return jsonify({"ok": True, "data": article.to_json()}), 200

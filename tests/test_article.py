@@ -186,3 +186,79 @@ def test_article_filter_and(client):
 
     assert len(resp.json['data']) == 1
     assert resp.json['data'][0]['name'] == 'second_name'
+
+
+def test_article_patch_empty(client):
+    resp = client.patch('/article/')
+    assert resp.status_code == 400
+
+
+def test_article_patch_invalid(client):
+    resp = client.patch('/article/', data='not even json')
+    assert resp.status_code == 400
+
+
+def test_article_patch_no_id(client):
+    resp = client.patch('/article/', data=json.dumps({
+        'price': 1,
+    }), content_type='application/json')
+    assert resp.status_code == 400
+
+
+def test_patch_bad_field(client):
+    client.post('/article/', data=json.dumps({
+        'price': 1,
+        'name': 'nombre',
+        'description': "desc",
+        'available_units': 11,
+        'latitude': 0,
+        'longitude': 0,
+    }), content_type='application/json')
+
+    resp = client.patch('/article/', data=json.dumps({
+        '_id': 'badidsbadidsbadidsbadidsbadidsbadids',
+        'name': 'new name',
+    }), content_type='application/json')
+
+    assert resp.status_code == 400
+
+
+def test_patch_bad_type(client):
+    post = client.post('/article/', data=json.dumps({
+        'price': 1,
+        'name': 'nombre',
+        'description': "desc",
+        'available_units': 11,
+        'latitude': 0,
+        'longitude': 0,
+    }), content_type='application/json')
+
+    _id = post.json['_id']
+    resp = client.patch('/article/', data=json.dumps({
+        '_id': _id,
+        'name': 1,
+    }), content_type='application/json')
+
+    assert resp.status_code == 400
+
+
+def test_article_patch(client):
+    post = client.post('/article/', data=json.dumps({
+        'price': 1,
+        'name': 'nombre',
+        'description': "desc",
+        'available_units': 11,
+        'latitude': 0,
+        'longitude': 0,
+    }), content_type='application/json')
+
+    _id = post.json['_id']
+    resp = client.patch('/article/', data=json.dumps({
+        '_id': _id,
+        'name': 'new name',
+    }), content_type='application/json')
+
+    assert resp.status_code == 200
+
+    get = client.get('/article/')
+    assert get.json['data'][0]['name'] == 'new name'

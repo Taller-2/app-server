@@ -78,3 +78,15 @@ def test_get_filters():
 
     assert len(models) == 1
     assert models[0]["test_field"] == "hola"
+
+
+def test_model_update():
+    article = TestModel({"test_field": "hola"})
+    article.save()
+
+    assert len(TestModel.get_many()) == 1
+
+    article.update(test_field="chau")
+    assert len(TestModel.get_many()) == 1
+
+    assert TestModel.get_one(article.get_id())['test_field'] == 'chau'
