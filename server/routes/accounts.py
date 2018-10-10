@@ -24,6 +24,7 @@ def update_current_account():
     account = Account.current()
     account['email'] = body['email']
     account['name'] = body['name']
+    account['profile_picture_url'] = body['profile_picture_url']
     account.save()
 
     return response(message="Successfully updated current account!", ok=True)
