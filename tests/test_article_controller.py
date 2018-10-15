@@ -12,17 +12,26 @@ def setup_function():
         'name': fake.word(),
         'description': fake.sentence(),
         'available_units': fake.pyint(),
-        'price': fake.pyfloat(),
+        'price': 20.0,
         'latitude': 0.0,
         'longitude': 0.0,
         'user': fake.word(),
     }).save()
 
+    Article({
+        'name': fake.word(),
+        'description': fake.sentence(),
+        'available_units': fake.pyint(),
+        'price': 300.0,
+        'latitude': 1.0,
+        'longitude': 1.0,
+        'user': fake.word(),
+    }).save()
 
 def test_no_args_fetches_all():
     articles = ArticleController().get_articles()
 
-    assert len(articles) == 1
+    assert len(articles) == 2
     assert articles[0]['latitude'] == 0
     assert articles[0]['longitude'] == 0
 
@@ -64,3 +73,17 @@ def teardown_function():
 
     for a in Article.get_many():
         a.delete()
+
+
+def test_article_filter_by_price():
+    articles = ArticleController(price_min=[300]).get_articles()
+    assert len(articles) == 1
+
+
+def test_article_filter_by_price_and_distance():
+    articles = ArticleController(my_lat=[1.0],
+                                 my_lon=[1.0],
+                                 max_distance=[1],
+                                 price_min=[200]).get_articles()
+
+    assert len(articles) == 1

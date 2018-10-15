@@ -67,14 +67,16 @@ class Model:
     def get_many(cls, *_, **kwargs) -> list:
         mongo_query = cls.make_mongo_query(kwargs)
 
+        return cls.run_query(mongo_query)
+
+    @classmethod
+    def run_query(cls, mongo_query):
         models = []
         results = mongo.db[cls.db_name].find(mongo_query)
-
         for result in results:
             model = cls(result)
             model._id = result['_id']
             models.append(model)
-
         return models
 
     @classmethod
