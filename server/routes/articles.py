@@ -1,5 +1,6 @@
 from flask import request, Blueprint, jsonify
 
+from server.controllers.article import ArticleController
 from server.decorators.login_required import login_required
 from server.model.article import Article
 from server.model.user import user_id
@@ -33,11 +34,10 @@ def delete_article(_id):
 @ARTICLES_BP.route('/', methods=['GET'])
 def get_article():
     try:
-        articles = Article.get_many(**request.args)
-    except ValueError:
-        received = request.query_string.decode('utf-8')
-        return response(message=f"Error parsing querystring parameters. "
-                                f"Received '{received}'",
+        articles = ArticleController(**request.args).get_articles()
+    except ValueError as e:
+        return response(message=f"Error parsing querystring parameters: "
+                                f"{e}",
                         ok=False), 400
     except KeyError as e:
         keys = ', '.join(Article.schema.keys())
