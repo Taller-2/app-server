@@ -115,7 +115,7 @@ class Model:
     def save(self):
         collection = mongo.db[self.db_name]
         if self._id:
-            collection.update({'_id': self._id}, {"$set": self._data})
+            collection.update_one({'_id': self._id}, {"$set": self._data})
         else:
             self._id = collection.insert_one(self._data).inserted_id
         return str(self._id)
