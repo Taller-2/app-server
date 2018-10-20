@@ -98,7 +98,7 @@ class Model:
 
             for value in filters[key]:
                 try:
-                    value = cls.schema[key](value)
+                    value = cls.cast_value(value, key)
                 except ValueError as e:
                     raise ValueError(f'Error in query parameter {key}: {e}')
                 key_or.append({key: value})
@@ -134,6 +134,25 @@ class Model:
 
     def get_id(self):
         return str(self._id)
+
+    @classmethod
+    def cast_value(cls, value, key):
+        cast_type = cls.schema[key]
+
+        if type(cast_type) == typing._Union:
+            # Special case: if arg is a list, we return element as-is
+            # we assume lists are made up of strings only
+            if list in cast_type.__args__:
+                return value
+
+            for _type in cast_type.__args__:
+                try:
+                    return _type(value)
+                except TypeError:
+                    continue
+            raise ValueError(f"Bad type for {value}")
+
+        return cast_type(value)
 
 
 def throw_bad_type_union(field, union, got_type):

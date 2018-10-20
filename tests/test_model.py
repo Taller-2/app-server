@@ -1,3 +1,5 @@
+from typing import Optional
+
 import pytest
 
 from server.model.base import Model
@@ -11,7 +13,8 @@ def setup_function():
 # Sample model implementation for tests
 class TestModel(Model):
     schema = {
-        'test_field': str
+        'test_field': str,
+        'test_list': Optional[list],
     }
 
     db_name = 'test_db'
@@ -90,3 +93,24 @@ def test_model_update():
     assert len(TestModel.get_many()) == 1
 
     assert TestModel.get_one(article.get_id())['test_field'] == 'chau'
+
+
+def test_model_optional_field():
+    article = TestModel({"test_field": "hola",
+                         "test_list": ["hola"]})
+    article.save()
+
+    assert TestModel.get_one(article.get_id())['test_list'][0] == 'hola'
+
+
+def test_model_filter_by_list_type():
+    TestModel({"test_field": "hola",
+               "test_list": ["hola"]}).save()
+
+    article = TestModel({"test_field": "hola",
+                         "test_list": ["chau"]})
+
+    article.save()
+    result = TestModel.get_many(test_list=["chau"])
+    assert len(result) == 1
+    assert result[0].get_id() == article.get_id()
