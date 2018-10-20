@@ -1,14 +1,12 @@
 from flask import request, Blueprint, jsonify
-
 from server.model.article_statistics import ArticleStatistics
 from server.utils import response
 
-ARTICLE_STATISTICS_BP = \
-    Blueprint(
-        'articles_statistics', __name__, url_prefix='/article_statistics')
+ARTICLE_STATS_BP = \
+    Blueprint('articles_stats', __name__, url_prefix='/article_stats')
 
 
-@ARTICLE_STATISTICS_BP.route('/', methods=['GET'])
+@ARTICLE_STATS_BP.route('/', methods=['GET'])
 def get_article():
     try:
         articles_statistics = ArticleStatistics.get_many(**request.args)
