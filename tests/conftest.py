@@ -12,5 +12,6 @@ def client():
 
     # Clear databases
     mongo.db['articles'].delete_many({})
+    mongo.db['articles_statistics'].delete_many({})
     yield client
 
