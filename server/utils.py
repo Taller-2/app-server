@@ -1,4 +1,8 @@
+from typing import Callable, Sequence, Type
+
 from flask import request, jsonify
+
+from server.model.base import Model
 
 
 # pylint: disable=C0103
@@ -7,7 +11,8 @@ def response(message: str, ok: bool, **kwargs):
     return jsonify({'message': message, 'ok': ok, **kwargs})
 
 
-def find_all(cls, get_instances=None):
+def find_all(cls: Type[Model],
+             get_instances: Callable[[], Sequence[Model]] = None):
     try:
         if get_instances:
             instances = get_instances()
@@ -26,7 +31,9 @@ def find_all(cls, get_instances=None):
     return jsonify({"ok": True, "data": data}), 200
 
 
-def create(cls, optional_fields=None, additional_fields=None):
+def create(cls: Type[Model],
+           optional_fields: Sequence[str] = None,
+           additional_fields: dict = None):
     body = request.get_json(silent=True)
 
     if not body:
