@@ -7,13 +7,15 @@ def response(message: str, ok: bool, **kwargs):
     return jsonify({'message': message, 'ok': ok, **kwargs})
 
 
-def find_all(cls):
+def find_all(cls, get_instances=None):
     try:
-        instances = cls.get_many(**request.args)
-    except ValueError:
-        received = request.query_string.decode('utf-8')
+        if get_instances:
+            instances = get_instances()
+        else:
+            instances = cls.get_many(**request.args)
+    except ValueError as e:
         return response(message=f"Error parsing querystring parameters. "
-                                f"Received '{received}'",
+                                f"{e}",
                         ok=False), 400
     except KeyError as e:
         keys = ', '.join(cls.schema.keys())

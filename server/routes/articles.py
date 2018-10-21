@@ -1,5 +1,6 @@
 from flask import request, Blueprint, jsonify
 
+from server.controllers.article import ArticleController
 from server.decorators.login_required import login_required
 from server.model.article import Article
 from server.model.user import user_id
@@ -32,7 +33,10 @@ def delete_article(_id):
 
 @ARTICLES_BP.route('/', methods=['GET'])
 def get_article():
-    return find_all(Article)
+    return find_all(
+        Article,
+        get_instances=lambda: ArticleController(**request.args).get_articles()
+    )
 
 
 @ARTICLES_BP.route('/', methods=['POST'])
