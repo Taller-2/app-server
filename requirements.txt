@@ -1,3 +1,4 @@
+faker
 google
 flask
 pytest
@@ -13,3 +14,4 @@ coverage
 pytest-cov
 google-auth
 flask-cors==3.0.6
+haversine
