@@ -4,7 +4,7 @@ from server import utils
 from server.model.chat_message import ChatMessage
 
 CHAT_MESSAGES_BP = Blueprint('chat_messages', __name__,
-                             url_prefix='/chat-message')
+                             url_prefix='/chat_message')
 
 
 @CHAT_MESSAGES_BP.route('/', methods=['GET'])
