@@ -22,9 +22,9 @@ def update_current_account():
         return response("Invalid or empty request body", ok=False), 400
 
     account = Account.current()
-    account['email'] = body['email']
-    account['name'] = body['name']
-    account['profile_picture_url'] = body['profile_picture_url']
+    account['email'] = body.get('email')
+    account['name'] = body.get('name')
+    account['profile_picture_url'] = body.get('profile_picture_url')
     account.save()
 
     return response(message="Successfully updated current account!", ok=True)

@@ -1,9 +1,10 @@
 from flask import request, Blueprint, jsonify
 
+from server.controllers.article import ArticleController
 from server.decorators.login_required import login_required
 from server.model.article import Article
 from server.model.user import user_id
-from server.utils import response
+from server.utils import find_all, create, response
 
 ARTICLES_BP = Blueprint('articles', __name__, url_prefix='/article')
 
@@ -32,44 +33,18 @@ def delete_article(_id):
 
 @ARTICLES_BP.route('/', methods=['GET'])
 def get_article():
-    try:
-        articles = Article.get_many(**request.args)
-    except ValueError:
-        received = request.query_string.decode('utf-8')
-        return response(message=f"Error parsing querystring parameters. "
-                                f"Received '{received}'",
-                        ok=False), 400
-    except KeyError as e:
-        keys = ', '.join(Article.schema.keys())
-        return response(message=f"Invalid key {e}. "
-                                f"Valid parameters are {keys}",
-                        ok=False), 400
-    data = [article.to_json() for article in articles]
-    return jsonify({"ok": True, "data": data}), 200
+    return find_all(
+        Article,
+        get_instances=lambda: ArticleController(**request.args).get_articles()
+    )
 
 
 @ARTICLES_BP.route('/', methods=['POST'])
 @login_required
 def post_article():
-    body = request.get_json(silent=True)
-
-    if not body:
-        return response("Invalid or empty request body", ok=False), 400
-
-    body['user'] = user_id()
-
-    # Optional fields, zero or more. If not present, init them as an empty list
-    body.setdefault('pictures', [])
-    body.setdefault('payment_methods', [])
-    body.setdefault('tags', [])
-
-    try:
-        article = Article(body)
-    except ValueError as e:
-        return response(message=f"Error in validation: {e}", ok=False), 400
-
-    _id = article.save()
-    return jsonify({"ok": True, "_id": _id}), 200
+    return create(Article,
+                  optional_fields=['pictures', 'payment_methods', 'tags'],
+                  additional_fields={'user': user_id()})
 
 
 @ARTICLES_BP.route('/', methods=['PATCH'])
