@@ -1,6 +1,8 @@
 import json
 from unittest import mock
 
+from server.model.article import Article
+
 
 def test_with_client(client):
     resp = client.get('/')
@@ -262,3 +264,21 @@ def test_article_patch(client):
 
     get = client.get('/article/')
     assert get.json['data'][0]['name'] == 'new name'
+
+
+def test_get_categories(client):
+    resp = client.get('/article/categories/')
+    assert resp.json['categories'] == Article.CATEGORIES
+
+
+def post_invalid_category(client):
+    post = client.post('/article/', data=json.dumps({
+        'price': 1,
+        'name': 'nombre',
+        'description': "desc",
+        'available_units': 11,
+        'latitude': 0,
+        'longitude': 0,
+        'tags': ['bad_tag']
+    }), content_type='application/json')
+    assert post.status_code == 400

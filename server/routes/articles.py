@@ -70,3 +70,8 @@ def put_article():
         return response(message=f"Error in validation: {e}", ok=False), 400
 
     return jsonify({"ok": True, "data": article.to_json()}), 200
+
+
+@ARTICLES_BP.route('/categories/', methods=['GET'])
+def list_categories():
+    return jsonify({'categories': Article.CATEGORIES}), 200
