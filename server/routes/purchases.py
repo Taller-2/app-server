@@ -25,7 +25,7 @@ def buy():
     try:
         article = Article.get_one(article_id)
         if article is None:
-            response("article ID {article_id} not found", ok=False), 400
+            return response("article ID {article_id} not found", ok=False), 400
     except ValueError:
         return response(f"article_id not specified", ok=False), 400
 
