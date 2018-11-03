@@ -31,6 +31,15 @@ def delete_article(_id):
                     ok=True), 200
 
 
+@ARTICLES_BP.route('/<_id>/', methods=['GET'])
+def get_single_article(_id):
+    try:
+        return jsonify(Article.get_one(_id).to_json())
+    except ValueError:
+        return response(f"invalid id {_id}",
+                        ok=False), 400
+
+
 @ARTICLES_BP.route('/', methods=['GET'])
 def get_article():
     return find_all(

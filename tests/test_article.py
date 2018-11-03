@@ -282,3 +282,29 @@ def post_invalid_category(client):
         'tags': ['bad_tag']
     }), content_type='application/json')
     assert post.status_code == 400
+
+
+def test_get_single_article(client):
+    client.post('/article/', data=json.dumps({
+        'price': 1,
+        'name': 'nombre',
+        'description': "desc",
+        'available_units': 11,
+        'latitude': 0,
+        'longitude': 0,
+    }), content_type='application/json')
+
+    resp = client.get('/article/').json
+    _id = resp["data"][0]["_id"]
+
+    resp = client.get(f'/article/{_id}/')
+
+    assert resp.status_code == 200
+    assert resp.json['_id'] == _id
+
+
+def test_get_single_article_bad_id(client):
+    _id = 'bad_id'
+    resp = client.get(f'/article/{_id}/')
+
+    assert resp.status_code == 400
