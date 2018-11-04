@@ -46,3 +46,28 @@ class Article(Model):
             an_article = an_article.to_json()
             ArticleStatsController.save_statistic('get', an_article)
         return articles
+
+    CATEGORIES = [
+        "Tecnología",
+        "Belleza y Cuidado Personal",
+        "Deportes y Aire Libre",
+        "Hogar y Electrodomésticos",
+        "Juguetes y Bebés",
+        "Libros",
+        "Moda",
+        "Supermercado",
+        "Vehículos",
+        "Inmuebles",
+        "Servicios",
+    ]
+
+    @classmethod
+    def validate(cls, json):
+        super(Article, cls).validate(json)
+        tags = json.get('tags')
+        if not tags:
+            return
+
+        for tag in tags:
+            if tag not in Article.CATEGORIES:
+                raise ValueError(f"Invalid category for articles: {tag}")
