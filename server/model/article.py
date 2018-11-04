@@ -25,7 +25,7 @@ class Article(Model):
 
     def save(self):
         current_action = 'post'
-        if self.action != 'post' and self.action != '':
+        if self.action:
             current_action = self.action
         ArticleStatsController.save_statistic(current_action, self._data)
         return super(Article, self).save()
