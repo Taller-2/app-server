@@ -36,6 +36,7 @@ class Article(Model):
 
     def delete(self):
         self.action = 'delete'
+        ArticleStatsController.save_statistic(self.action, self._data)
         return super(Article, self).delete()
 
     @classmethod
