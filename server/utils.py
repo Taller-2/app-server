@@ -1,12 +1,12 @@
 from typing import Callable, Sequence, Type
 
-from flask import request, jsonify
+from datetime import datetime, timedelta
 
-from server.model.base import Model
+from flask import request, jsonify
 
 import jwt
 
-from datetime import datetime, timedelta
+from server.model.base import Model
 
 
 # pylint: disable=C0103
@@ -66,5 +66,6 @@ def get_shared_server_auth_header():
     app_server_secret = 'S3cret'
 
     expiration = datetime.utcnow() + timedelta(minutes=1)
-    encoded = jwt.encode({'name': app_server_name, 'exp': expiration}, app_server_secret, algorithm='HS256')
+    encoded = jwt.encode({'name': app_server_name, 'exp': expiration},
+                         app_server_secret, algorithm='HS256')
     return {'X-Auth-App': encoded}

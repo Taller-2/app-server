@@ -13,5 +13,6 @@ def root():
 # Shared server request example
 @EXAMPLE_BP.route('/payments')
 def payments():
-    r = requests.get("http://localhost:5000/payments", headers=get_shared_server_auth_header())
-    return jsonify({"test": r.json()})
+    response = requests.get("http://localhost:5000/payments",
+                            headers=get_shared_server_auth_header())
+    return jsonify({"test": response.json()})
