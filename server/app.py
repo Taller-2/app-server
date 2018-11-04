@@ -28,7 +28,7 @@ def create_app(conf='conf.local.Config'):
     from server.routes.ping import PING_BP
     from server.routes.articles import ARTICLES_BP
     from server.routes.accounts import ACCOUNTS_BP
-    from server.routes.articles_statistics import ARTICLE_STATS_BP
+    from server.routes.articles_stats import ARTICLE_STATS_BP
     from server.routes.chat_messages import CHAT_MESSAGES_BP
 
     app.register_blueprint(EXAMPLE_BP)
