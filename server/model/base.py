@@ -12,6 +12,10 @@ class Model:
     # Mongodb database name. Try to keep this unique between models!
     db_name = None
 
+    # Special formatting to give fields during JSON serializatiom.
+    # Keys: field names, values: callable to format (returns string)
+    field_formats = {}
+
     def __init__(self, json: dict):
         self.validate(json)
         self._data = json.copy()
@@ -109,6 +113,9 @@ class Model:
 
     def to_json(self):
         data = self._data.copy()
+        for field in data:
+            if self.field_formats.get(field):
+                data[field] = self.field_formats[field](data[field])
         data.update({'_id': self.get_id()})
         return data
 

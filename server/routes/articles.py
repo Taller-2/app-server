@@ -1,8 +1,12 @@
+from datetime import datetime
+
 from flask import request, Blueprint, jsonify
 
 from server.controllers.article import ArticleController
 from server.decorators.login_required import login_required
+from server.model.account import Account
 from server.model.article import Article
+from server.model.question import Question
 from server.model.user import user_id
 from server.utils import find_all, create, response
 
@@ -84,3 +88,67 @@ def put_article():
 @ARTICLES_BP.route('/categories/', methods=['GET'])
 def list_categories():
     return jsonify({'categories': Article.CATEGORIES}), 200
+
+
+@ARTICLES_BP.route('/<_id>/question/', methods=['GET'])
+def questions(_id):
+    try:
+        article = Article.get_one(_id)
+    except ValueError as e:
+        return response(message=str(e), ok=False), 400
+
+    if not article:
+        return response(message=f"Article {_id} not found", ok=False), 400
+
+    return jsonify({
+        'data': [q.to_json() for q in Question.get_many(article_id=_id)],
+        'ok': True
+    })
+
+
+@ARTICLES_BP.route('/<_id>/question/', methods=['POST'])
+@login_required
+def create_question(_id):
+    try:
+        article = Article.get_one(_id)
+    except ValueError as e:
+        return response(message=str(e), ok=False), 400
+
+    if not article:
+        return response(message=f"Article {_id} not found", ok=False), 400
+
+    return create(Question,
+                  additional_fields={'created_at': datetime.utcnow(),
+                                     'article_id': _id,
+                                     'user_id': Account.current().get_id()})
+
+
+@ARTICLES_BP.route('/<article_id>/question/<question_id>/', methods=['POST'])
+@login_required
+def answer_question(article_id, question_id):
+    try:
+        article = Article.get_one(article_id)
+    except ValueError as e:
+        return response(message=str(e), ok=False), 400
+
+    if not article:
+        return response(message=f"Article {article_id} not found",
+                        ok=False), 400
+
+    try:
+        question = Question.get_one(question_id)
+    except ValueError as e:
+        return response(message=str(e), ok=False), 400
+
+    body = request.get_json(silent=True)
+    if not body:
+        return response("Invalid or empty request body", ok=False), 400
+
+    answer = body.get('answer')
+    if not answer:
+        return response("No answer specified", ok=False), 400
+
+    answered_at = datetime.utcnow()
+
+    question.update(**{'answer': answer, 'answered_at': answered_at})
+    return jsonify({"ok": True, "data": question.to_json()}), 200
