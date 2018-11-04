@@ -7,7 +7,7 @@ pylint
 gunicorn
 flask_pymongo
 pymongo==3.4.0
-requests==2.18.1
+requests>=2.20.0
 passlib[totp]
 python-coveralls
 coverage
