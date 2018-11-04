@@ -1,8 +1,6 @@
 from typing import Optional
-import time
-import datetime
 from server.model.base import Model
-from server.model.article_statistics import ArticleStatistics
+from server.controllers.article_stats import ArticleStatsController
 
 
 class Article(Model):
@@ -21,19 +19,29 @@ class Article(Model):
         'tags': Optional[list]
     }
 
-    def save_statistic(self, action):
-        ts = time.time()
-        st = datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S')
-        body = {}
-        for key in self._data.keys():
-            if key not in ArticleStatistics.schema.keys():
-                continue
-            body[key] = self._data[key]
-        body['action'] = action
-        body['timestamp'] = st
-        article_statistics = ArticleStatistics(body)
-        article_statistics.save()
+    def __init__(self, json: dict):
+        self.action = ''
+        super().__init__(json)
 
     def save(self):
-        self.save_statistic('post')
+        current_action = 'post'
+        if self.action != 'post' and self.action != '':
+            current_action = self.action
+        ArticleStatsController.save_statistic(current_action, self._data)
         return super(Article, self).save()
+
+    def update(self, **values):
+        self.action = 'update'
+        return super(Article, self).update(**values)
+
+    def delete(self):
+        self.action = 'delete'
+        return super(Article, self).delete()
+
+    @classmethod
+    def get_many(cls, *_, **kwargs):
+        articles = super(Article, cls).get_many(**kwargs)
+        for an_article in articles:
+            an_article = an_article.to_json()
+            ArticleStatsController.save_statistic('get', an_article)
+        return articles
