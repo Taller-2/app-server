@@ -28,12 +28,15 @@ def create_app(conf='conf.local.Config'):
     from server.routes.ping import PING_BP
     from server.routes.articles import ARTICLES_BP
     from server.routes.accounts import ACCOUNTS_BP
+    from server.routes.articles_stats import ARTICLE_STATS_BP
     from server.routes.chat_messages import CHAT_MESSAGES_BP
     from server.routes.purchases import PURCHASES_BP
+
     app.register_blueprint(EXAMPLE_BP)
     app.register_blueprint(PING_BP)
     app.register_blueprint(ARTICLES_BP)
     app.register_blueprint(ACCOUNTS_BP)
+    app.register_blueprint(ARTICLE_STATS_BP)
     app.register_blueprint(CHAT_MESSAGES_BP)
     app.register_blueprint(PURCHASES_BP)
 
