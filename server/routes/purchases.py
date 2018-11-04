@@ -20,6 +20,9 @@ def get_purchases():
 @login_required
 def buy():
     body = request.json
+    if body is None:
+        return response("Request body is null", ok=False), 400
+
     article_id = body.get('article_id')
 
     try:
