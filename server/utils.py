@@ -1,6 +1,10 @@
 from typing import Callable, Sequence, Type
 
+from datetime import datetime, timedelta
+
 from flask import request, jsonify
+
+import jwt
 
 from server.model.base import Model
 
@@ -54,3 +58,14 @@ def create(cls: Type[Model],
 
     _id = instance.save()
     return jsonify({"ok": True, "_id": _id}), 200
+
+
+def get_shared_server_auth_header():
+    # Set this values in some config file
+    app_server_name = 'app1'
+    app_server_secret = 'S3cret'
+
+    expiration = datetime.utcnow() + timedelta(minutes=1)
+    encoded = jwt.encode({'name': app_server_name, 'exp': expiration},
+                         app_server_secret, algorithm='HS256')
+    return {'X-Auth-App': encoded}
