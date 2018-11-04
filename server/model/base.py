@@ -109,7 +109,7 @@ class Model:
 
     def to_json(self):
         data = self._data.copy()
-        data.update({'_id': self._id})
+        data.update({'_id': self.get_id()})
         return data
 
     def save(self):
