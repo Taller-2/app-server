@@ -7,7 +7,7 @@ ARTICLE_STATS_BP = \
 
 
 @ARTICLE_STATS_BP.route('/', methods=['GET'])
-def get_article():
+def get_article_stats():
     try:
         articles_statistics = ArticleStatistics.get_many(**request.args)
     except ValueError:
