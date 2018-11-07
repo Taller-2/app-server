@@ -1,6 +1,8 @@
 from typing import Optional
-from server.model.base import Model
+
 from server.controllers.article_stats import ArticleStatsController
+from server.model.account import Account
+from server.model.base import Model
 
 
 class Article(Model):
@@ -28,7 +30,12 @@ class Article(Model):
         if self.action:
             current_action = self.action
         ArticleStatsController.save_statistic(current_action, self._data)
-        return super(Article, self).save()
+        account = self.account()
+        is_new = not self._id
+        _id = super(Article, self).save()
+        if is_new and account:
+            account.register_publication()
+        return _id
 
     def update(self, **values):
         self.action = 'update'
@@ -71,3 +78,9 @@ class Article(Model):
         for tag in tags:
             if tag not in Article.CATEGORIES:
                 raise ValueError(f"Invalid category for articles: {tag}")
+
+    def account(self) -> Optional[Account]:
+        try:
+            return Account.get_many(user_id=self['user'])[0]
+        except IndexError:
+            return None

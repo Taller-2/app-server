@@ -1,3 +1,4 @@
+python-dateutil==2.7.5
 faker
 google
 flask

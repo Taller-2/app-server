@@ -8,6 +8,7 @@ from server.model.account import Account
 from server.model.article import Article
 from server.model.question import Question
 from server.model.user import user_id
+from server.shared_server import shared_server
 from server.utils import find_all, create, response
 
 ARTICLES_BP = Blueprint('articles', __name__, url_prefix='/article')
@@ -42,6 +43,32 @@ def get_single_article(_id):
     except ValueError:
         return response(f"invalid id {_id}",
                         ok=False), 400
+
+
+@ARTICLES_BP.route('/<_id>/shipment_cost/', methods=['GET'])
+def shipment_cost(_id):
+    args = request.args
+    lat = args.get('my_lat')
+    lon = args.get('my_lon')
+    if not (lat and lon):
+        return response(message=f"latitude and longitude missing",
+                        ok=False), 400
+    try:
+        article = Article.get_one(_id)
+    except ValueError as e:
+        return response(message=str(e), ok=False), 400
+    if not article:
+        return response(message=f"Article {_id} not found", ok=False), 400
+    cost_response = shared_server.shipment_cost(
+        article, float(lat), float(lon)
+    )
+    data = cost_response.json()
+    if 'cost' in data:
+        data['cost'] = float(data['cost'])
+    return jsonify({
+        'ok': cost_response.ok,
+        'data': data
+    }), cost_response.status_code
 
 
 @ARTICLES_BP.route('/', methods=['GET'])
