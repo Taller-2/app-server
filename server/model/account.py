@@ -30,22 +30,18 @@ class Account(Model):
             self['score'] = 0
         return super(Account, self).save()
 
-    def antiquity(self):
+    def antiquity(self) -> int:
         if not self['created_at']:
             return 0
         return relativedelta(datetime.utcnow(), self['created_at']).years
 
-    def score(self):
+    def score(self) -> float:
         return self['score'] or 0
 
-    def increment_score(self, increment: int):
+    def register(self, event: str):
+        increment = {
+            'publication': 1,
+            'purchase': 5,
+            'sale': 10,
+        }[event]
         self.update(score=self.score() + increment)
-
-    def register_publication(self):
-        self.increment_score(1)
-
-    def register_purchase(self):
-        self.increment_score(5)
-
-    def register_sale(self):
-        self.increment_score(10)

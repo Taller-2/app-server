@@ -48,7 +48,7 @@ class Purchase(Model):
         seller = self.seller()
         purchaser = self.purchaser()
         if seller:
-            seller.register_sale()
+            seller.register('sale')
         if purchaser:
-            purchaser.register_purchase()
+            purchaser.register('purchase')
         return _id

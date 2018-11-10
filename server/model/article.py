@@ -34,7 +34,7 @@ class Article(Model):
         is_new = not self._id
         _id = super(Article, self).save()
         if is_new and account:
-            account.register_publication()
+            account.register('publication')
         return _id
 
     def update(self, **values):
