@@ -28,17 +28,12 @@ class Purchase(Model):
         return result
 
     def seller(self) -> Optional[Account]:
-        try:
-            article = Article.get_many(user=self['article_id'])[0]
-        except IndexError:
-            return None
-        return article.account()
+        articles = Article.get_many(user=self['article_id'])
+        return articles[0].account() if articles else None
 
     def purchaser(self) -> Optional[Account]:
-        try:
-            return Account.get_many(user_id=self['user_id'])[0]
-        except IndexError:
-            return None
+        accounts = Account.get_many(user_id=self['user_id'])
+        return accounts[0] if accounts else None
 
     def save(self):
         is_new = self.is_new_instance()
