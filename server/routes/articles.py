@@ -46,12 +46,23 @@ def get_single_article(_id):
 
 
 @ARTICLES_BP.route('/<_id>/shipment_cost/', methods=['GET'])
+@login_required
 def shipment_cost(_id):
     args = request.args
+    payment_method = args.get('payment_method')
+    if not payment_method:
+        return response(message=f"payment_method missing",
+                        ok=False), 400
     lat = args.get('my_lat')
     lon = args.get('my_lon')
     if not (lat and lon):
         return response(message=f"latitude and longitude missing",
+                        ok=False), 400
+    try:
+        lat = float(lat)
+        lon = float(lon)
+    except ValueError:
+        return response(message="latitude and longitude must be numbers",
                         ok=False), 400
     try:
         article = Article.get_one(_id)
@@ -60,7 +71,7 @@ def shipment_cost(_id):
     if not article:
         return response(message=f"Article {_id} not found", ok=False), 400
     cost_response = shared_server.shipment_cost(
-        article, float(lat), float(lon)
+        article, lat, lon, payment_method
     )
     data = cost_response.json()
     if 'cost' in data:
