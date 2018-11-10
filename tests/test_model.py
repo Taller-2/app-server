@@ -2,8 +2,8 @@ from typing import Optional
 
 import pytest
 
-from server.model.base import Model
 from server.libs.mongo import mongo
+from server.model.base import Model
 
 
 def setup_function():
@@ -64,7 +64,6 @@ def test_write_model_to_db():
 
 
 def test_delete_model():
-
     model = TestModel({"test_field": "hola"})
 
     model.save()

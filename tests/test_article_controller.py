@@ -1,8 +1,8 @@
-from pytest import raises
-from server.model.article import Article
-from server.controllers.article import ArticleController
-
 from faker import Faker
+from pytest import raises
+
+from server.controllers.article import ArticleController
+from server.model.article import Article
 
 
 def setup_function():
@@ -27,6 +27,7 @@ def setup_function():
         'longitude': 1.0,
         'user': fake.word(),
     }).save()
+
 
 def test_no_args_fetches_all():
     articles = ArticleController().get_articles()
@@ -70,7 +71,6 @@ def test_article_filter_by_distance():
 
 
 def teardown_function():
-
     for a in Article.get_many():
         a.delete()
 

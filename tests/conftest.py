@@ -1,8 +1,8 @@
 import pytest
 from faker import Faker
-from server.libs.mongo import mongo
 
 from server.app import create_app
+from server.libs.mongo import mongo
 from server.model.article import Article
 
 fake = Faker()
