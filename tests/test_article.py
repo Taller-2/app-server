@@ -317,6 +317,10 @@ def test_get_single_article_bad_id(client):
 
 
 def test_first_save_registers_publication():
+    for account in Account.get_many():
+        account.delete()
+    for article in Article.get_many():
+        article.delete()
     user_id = 'user_id'
     score = random.randint(0, 100)
     account_id = Account({

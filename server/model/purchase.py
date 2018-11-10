@@ -28,8 +28,8 @@ class Purchase(Model):
         return result
 
     def seller(self) -> Optional[Account]:
-        articles = Article.get_many(user=self['article_id'])
-        return articles[0].account() if articles else None
+        article = Article.get_one(self['article_id'])
+        return article.account() if article else None
 
     def purchaser(self) -> Optional[Account]:
         accounts = Account.get_many(user_id=self['user_id'])
