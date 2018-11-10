@@ -1,7 +1,13 @@
 import json
+import random
 from unittest import mock
 
+from faker import Faker
+
+from server.model.account import Account
 from server.model.article import Article
+
+fake = Faker()
 
 
 def test_with_client(client):
@@ -308,3 +314,26 @@ def test_get_single_article_bad_id(client):
     resp = client.get(f'/article/{_id}/')
 
     assert resp.status_code == 400
+
+
+def test_first_save_registers_publication():
+    user_id = 'user_id'
+    score = random.randint(0, 100)
+    account_id = Account({
+        'user_id': user_id,
+        'email': fake.email(),
+        'name': fake.sentence(),
+        'score': score
+    }).save()
+    article_id = Article({
+        'name': fake.word(),
+        'description': fake.sentence(),
+        'available_units': fake.pyint(),
+        'price': 20.0,
+        'latitude': 0.0,
+        'longitude': 0.0,
+        'user': user_id,
+    }).save()
+    assert Account.get_one(account_id).score() == score + 1
+    Article.get_one(article_id).save()
+    assert Account.get_one(account_id).score() == score + 1
