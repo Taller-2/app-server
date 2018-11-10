@@ -80,7 +80,5 @@ class Article(Model):
                 raise ValueError(f"Invalid category for articles: {tag}")
 
     def account(self) -> Optional[Account]:
-        try:
-            return Account.get_many(user_id=self['user'])[0]
-        except IndexError:
-            return None
+        accounts = Account.get_many(user_id=self['user'])
+        return accounts[0] if accounts else None
