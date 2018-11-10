@@ -1,4 +1,5 @@
 import typing
+
 from bson import ObjectId
 
 from server.libs.mongo import mongo
@@ -142,6 +143,9 @@ class Model:
     def get_id(self):
         return str(self._id)
 
+    def is_new_instance(self):
+        return self._id is None
+
     @classmethod
     def cast_value(cls, value, key):
         cast_type = cls.schema[key]
@@ -171,7 +175,7 @@ def throw_bad_type_union(field, union, got_type):
 
 def throw_bad_type(field, expected_type, got_type):
     type_name = got_type.__name__ \
-            if got_type is not type(None) else "null"  # noqa: E721
+        if got_type is not type(None) else "null"  # noqa: E721
 
     raise ValueError(f"Bad type for field '{field}'. "
                      f"Expected {expected_type.__name__}, "
@@ -183,6 +187,8 @@ def validate_type(field_name: str, value: typing.Any, expected_type):
         valid_type = False
         for _type in expected_type.__args__:
             if isinstance(value, _type):
+                valid_type = True
+            if _type == float and isinstance(value, int):
                 valid_type = True
 
         if not valid_type:

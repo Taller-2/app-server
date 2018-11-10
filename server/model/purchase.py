@@ -1,3 +1,5 @@
+from typing import Optional
+
 from server.model.account import Account
 from server.model.article import Article
 from server.model.base import Model
@@ -24,3 +26,24 @@ class Purchase(Model):
             ).to_json()
             result.append(purchase)
         return result
+
+    def seller(self) -> Optional[Account]:
+        article = Article.get_one(self['article_id'])
+        return article.account() if article else None
+
+    def purchaser(self) -> Optional[Account]:
+        accounts = Account.get_many(user_id=self['user_id'])
+        return accounts[0] if accounts else None
+
+    def save(self):
+        is_new = self.is_new_instance()
+        _id = super(Purchase, self).save()
+        if not is_new:
+            return _id
+        seller = self.seller()
+        purchaser = self.purchaser()
+        if seller:
+            seller.register('sale')
+        if purchaser:
+            purchaser.register('purchase')
+        return _id

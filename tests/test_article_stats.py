@@ -1,5 +1,6 @@
 import json
 
+
 def test_log_data_of_inserted_article(client):
     client.post('/article/', data=json.dumps({
         'price': 1,
