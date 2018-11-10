@@ -14,7 +14,7 @@ def shipment_cost(article: Article, lat: float, lon: float,
                   payment_method: str):
     account = Account.current()
     now = datetime.now()
-    return requests.post(URL + 'shipment-cost', json={
+    return requests.post(f'{URL}shipment-cost', json={
         'antiquity': account.antiquity(),
         'email': account['email'],
         'userScore': account.score(),
