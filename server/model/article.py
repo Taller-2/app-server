@@ -31,7 +31,7 @@ class Article(Model):
             current_action = self.action
         ArticleStatsController.save_statistic(current_action, self._data)
         account = self.account()
-        is_new = not self._id
+        is_new = self.is_new_instance()
         _id = super(Article, self).save()
         if is_new and account:
             account.register('publication')

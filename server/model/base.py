@@ -143,6 +143,9 @@ class Model:
     def get_id(self):
         return str(self._id)
 
+    def is_new_instance(self):
+        return self._id is None
+
     @classmethod
     def cast_value(cls, value, key):
         cast_type = cls.schema[key]

@@ -41,7 +41,7 @@ class Purchase(Model):
             return None
 
     def save(self):
-        is_new = not self._id
+        is_new = self.is_new_instance()
         _id = super(Purchase, self).save()
         if not is_new:
             return _id
