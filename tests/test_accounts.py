@@ -1,4 +1,25 @@
 import json
+import random
+from datetime import datetime
+
+from faker import Faker
+from freezegun import freeze_time
+
+from server.model.account import Account
+
+fake = Faker()
+
+
+def account(extra_attrs: dict = None) -> Account:
+    attrs = {
+        'user_id': fake.word(),
+        'email': fake.email(),
+        'name': fake.sentence()
+    }
+    if extra_attrs is not None:
+        attrs = {**attrs, **extra_attrs}
+    _id = Account(attrs).save()
+    return Account.get_one(_id)
 
 
 def test_get_current_account(client):
@@ -21,3 +42,43 @@ def test_update_current_account(client):
     assert resp.json['data']['email'] == email
     assert resp.json['data']['name'] == name
     assert resp.json['data']['profile_picture_url'] == profile_picture_url
+
+
+@freeze_time("2012-01-01")
+def test_save_sets_defaults():
+    _account = account()
+    assert _account['score'] == 0
+    assert _account['created_at'] == datetime.utcnow()
+
+
+@freeze_time("2012-01-01")
+def test_antiquity():
+    _account = account({'created_at': datetime(2010, 1, 1)})
+    assert _account.antiquity() == 2012 - 2010
+
+
+def test_score():
+    score = 10
+    _account = account({'score': score})
+    assert _account.score() == _account['score'] == 10
+
+
+def test_register_publication():
+    _account = account({'score': random.randint(0, 100)})
+    previous_score = _account.score()
+    _account.register('publication')
+    assert Account.get_one(_account.get_id()).score() == previous_score + 1
+
+
+def test_register_purchase():
+    _account = account({'score': random.randint(0, 100)})
+    previous_score = _account.score()
+    _account.register('purchase')
+    assert Account.get_one(_account.get_id()).score() == previous_score + 5
+
+
+def test_register_sale():
+    _account = account({'score': random.randint(0, 100)})
+    previous_score = _account.score()
+    _account.register('sale')
+    assert Account.get_one(_account.get_id()).score() == previous_score + 10

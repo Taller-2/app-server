@@ -1,7 +1,15 @@
 import json
+import random
 from unittest import mock
 
+import requests_mock
+from faker import Faker
+
+from server.model.account import Account
 from server.model.article import Article
+from server.shared_server.shared_server import URL as shared_server_url
+
+fake = Faker()
 
 
 def test_with_client(client):
@@ -303,8 +311,112 @@ def test_get_single_article(client):
     assert resp.json['_id'] == _id
 
 
+def test_shipment_cost_no_payment_method(client):
+    article_id = Article({
+        'name': fake.word(),
+        'description': fake.sentence(),
+        'available_units': fake.pyint(),
+        'price': 20.0,
+        'latitude': 0.0,
+        'longitude': 0.0,
+        'user': fake.word(),
+    }).save()
+    response = client.get(f'/article/{article_id}/shipment_cost/?'
+                          f'my_lat=0&my_lon=0')
+    assert response.status_code == 400
+    assert not response.json['ok']
+
+
+def test_shipment_cost_no_coordinates(client):
+    article_id = Article({
+        'name': fake.word(),
+        'description': fake.sentence(),
+        'available_units': fake.pyint(),
+        'price': 20.0,
+        'latitude': 0.0,
+        'longitude': 0.0,
+        'user': fake.word(),
+    }).save()
+    response = client.get(f'/article/{article_id}/shipment_cost/?'
+                          f'payment_method=cash')
+    assert response.status_code == 400
+    assert not response.json['ok']
+
+
+def test_shipment_cost_non_numeric_coordinates(client):
+    article_id = Article({
+        'name': fake.word(),
+        'description': fake.sentence(),
+        'available_units': fake.pyint(),
+        'price': 20.0,
+        'latitude': 0.0,
+        'longitude': 0.0,
+        'user': fake.word(),
+    }).save()
+    response = client.get(f'/article/{article_id}/shipment_cost/?'
+                          f'payment_method=cash&'
+                          f'my_lat=qwe&my_lon=fds')
+    assert response.status_code == 400
+    assert not response.json['ok']
+
+
+def test_shipment_cost(client):
+    shared_server_response = {
+        'cost': 12.0,
+        'status': 'enabled'
+    }
+    shared_server_response_json = json.dumps(shared_server_response,
+                                             sort_keys=True)
+    article_id = Article({
+        'name': fake.word(),
+        'description': fake.sentence(),
+        'available_units': fake.pyint(),
+        'price': 20.0,
+        'latitude': 0.0,
+        'longitude': 0.0,
+        'user': fake.word(),
+    }).save()
+    with requests_mock.Mocker() as _mock:
+        _mock.post(f'{shared_server_url}shipment-cost',
+                   json=shared_server_response)
+        response = client.get(f'/article/{article_id}/shipment_cost/?'
+                              f'payment_method=cash&'
+                              f'my_lat=0&my_lon=0')
+        my_response_json_data = json.dumps(response.json['data'],
+                                           sort_keys=True)
+        assert response.json['ok']
+        assert my_response_json_data == shared_server_response_json
+
+
 def test_get_single_article_bad_id(client):
     _id = 'bad_id'
     resp = client.get(f'/article/{_id}/')
 
     assert resp.status_code == 400
+
+
+def test_first_save_registers_publication():
+    for account in Account.get_many():
+        account.delete()
+    for article in Article.get_many():
+        article.delete()
+    user_id = 'user_id'
+    score = random.randint(0, 100)
+    account_id = Account({
+        'user_id': user_id,
+        'email': fake.email(),
+        'name': fake.sentence(),
+        'score': score
+    }).save()
+    article_id = Article({
+        'name': fake.word(),
+        'description': fake.sentence(),
+        'available_units': fake.pyint(),
+        'price': 20.0,
+        'latitude': 0.0,
+        'longitude': 0.0,
+        'user': user_id,
+    }).save()
+    assert Account.get_one(account_id).score() == score + 1
+    Article.get_one(article_id).save()
+    assert Account.get_one(account_id).score() == score + 1
