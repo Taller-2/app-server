@@ -368,8 +368,8 @@ def test_shipment_cost(client):
             'status': 'enabled'
         }
     }
-    shared_server_response_json = json.dumps(shared_server_response,
-                                             sort_keys=True)
+    shared_server_response_json_data =\
+        json.dumps(shared_server_response['cost'], sort_keys=True)
     article_id = Article({
         'name': fake.word(),
         'description': fake.sentence(),
@@ -388,7 +388,7 @@ def test_shipment_cost(client):
         my_response_json_data = json.dumps(response.json['data'],
                                            sort_keys=True)
         assert response.json['ok']
-        assert my_response_json_data == shared_server_response_json
+        assert my_response_json_data == shared_server_response_json_data
 
 
 def test_get_single_article_bad_id(client):

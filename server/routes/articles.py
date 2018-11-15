@@ -76,7 +76,7 @@ def shipment_cost(_id):
     data = cost_response.json()
     return jsonify({
         'ok': data["success"],
-        'data': data
+        'data': data["cost"]
     }), cost_response.status_code
 
 
