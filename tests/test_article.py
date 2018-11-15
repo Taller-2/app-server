@@ -362,8 +362,11 @@ def test_shipment_cost_non_numeric_coordinates(client):
 
 def test_shipment_cost(client):
     shared_server_response = {
-        'cost': 12.0,
-        'status': 'enabled'
+        "success": True,
+        "cost": {
+            'cost': 12.0,
+            'status': 'enabled'
+        }
     }
     shared_server_response_json = json.dumps(shared_server_response,
                                              sort_keys=True)
