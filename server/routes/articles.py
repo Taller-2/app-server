@@ -74,10 +74,8 @@ def shipment_cost(_id):
         article, lat, lon, payment_method
     )
     data = cost_response.json()
-    if 'cost' in data:
-        data['cost'] = float(data['cost'])
     return jsonify({
-        'ok': cost_response.ok,
+        'ok': data["success"],
         'data': data
     }), cost_response.status_code
 
