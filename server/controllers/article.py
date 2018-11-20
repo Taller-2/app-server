@@ -1,16 +1,20 @@
+from typing import Sequence
+
 from haversine import haversine
 
+from server.controllers.article_stats import ArticleStatsController
 from server.model.article import Article
 
 
 class ArticleController:
-
     MY_LATITUDE = 'my_lat'
     MY_LONGITUDE = 'my_lon'
     MAX_DISTANCE = 'max_distance'
 
     PRICE_MIN = 'price_min'
     PRICE_MAX = 'price_max'
+
+    NAME_CONTAINS = 'name_contains'
 
     DISTANCE_ARGS = [MY_LATITUDE, MY_LONGITUDE, MAX_DISTANCE]
 
@@ -23,6 +27,8 @@ class ArticleController:
         self.price_min: float = None
         self.price_max: float = None
 
+        self.name = None
+
         self._validate_args()
 
     def _validate_args(self):
@@ -33,6 +39,13 @@ class ArticleController:
 
         self._init_distance_args()
         self._init_price_args()
+        self._init_name_filter()
+
+    def _init_name_filter(self):
+        if self.NAME_CONTAINS not in self.args:
+            return
+        tokens = self.args.pop(self.NAME_CONTAINS)[0].split(' ')
+        self.name = ''.join(f'.*{token}' for token in tokens)
 
     def _init_distance_args(self):
         if not any([x in self.args for x in self.DISTANCE_ARGS]):
@@ -53,19 +66,23 @@ class ArticleController:
 
     def _get_valid_arg_keys(self) -> list:
         return list(Article.schema.keys()) + self.DISTANCE_ARGS + \
-            [self.PRICE_MIN, self.PRICE_MAX]
+               [self.PRICE_MIN, self.PRICE_MAX, self.NAME_CONTAINS]
 
-    def get_articles(self):
-        if self.price_min or self.price_max:
-            articles = self.get_with_price_filters()
-        else:
-            articles = Article.get_many(**self.args)
+    def get_articles(self) -> Sequence[Article]:
+        articles = self.run_query()
 
         if not self.max_distance:
+            self.save_statistic(articles)
             return articles
 
         filtered_articles = self._filter_by_distance(articles)
+        self.save_statistic(articles)
         return filtered_articles
+
+    @staticmethod
+    def save_statistic(articles: Sequence[Article]):
+        for article in articles:
+            ArticleStatsController.save_statistic('get', article.to_json())
 
     def _filter_by_distance(self, articles: list) -> list:
         filtered_articles = []
@@ -93,13 +110,15 @@ class ArticleController:
             return None
         return float(value[0])
 
-    def get_with_price_filters(self):
+    def run_query(self):
         query = Article.make_mongo_query(self.args)
         new_queries = []
         if self.price_max:
             new_queries.append({"price": {"$lte": self.price_max}})
         if self.price_min:
             new_queries.append({"price": {"$gte": self.price_min}})
-
-        query["$and"] = query.get("$and", []) + new_queries
+        if self.name:
+            new_queries.append({"name": {'$regex': self.name}})
+        if new_queries:
+            query["$and"] = query.get("$and", []) + new_queries
         return Article.run_query(query)
