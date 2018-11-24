@@ -4,6 +4,7 @@ from server.decorators.login_required import login_required
 from server.model.account import Account
 from server.model.article import Article
 from server.model.purchase import Purchase
+from server.model.user import user_id
 from server.utils import response, create
 
 PURCHASES_BP = Blueprint('purchases', __name__, url_prefix='/purchase')
@@ -33,5 +34,9 @@ def buy():
         return response(f"article_id not specified", ok=False), 400
 
     account_id = Account.current().get_id()
+
+    if user_id() == article['user']:
+        return response("You can't purchase your own article", ok=False), 400
+
     body['user_id'] = account_id
     return create(Purchase, additional_fields={'user_id': account_id})
