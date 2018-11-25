@@ -1,5 +1,6 @@
 import json
 
+from server.model.account import Account
 from server.model.question import Question
 
 
@@ -99,3 +100,9 @@ def test_anwser_no_answer_in_body(client, article):
                        }), content_type='application/json')
 
     assert resp.status_code == 400
+
+
+def test_list_questions_initially_empty(client):
+    resp = client.get('/question/')
+    assert not resp.json['data']
+    assert isinstance(resp.json['data'], list)
