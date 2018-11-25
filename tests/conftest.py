@@ -19,6 +19,7 @@ def client():
     mongo.db['articles_statistics'].delete_many({})
     mongo.db['purchases'].delete_many({})
     mongo.db['questions'].delete_many({})
+    mongo.db['chat_message'].delete_many({})
     yield client
 
 
