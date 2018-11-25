@@ -9,7 +9,7 @@ from server.model.article import Article
 from server.model.question import Question
 from server.model.user import user_id
 from server.shared_server import shared_server
-from server.utils import find_all, create, response
+from server.utils import find_all, create, response, patch
 
 ARTICLES_BP = Blueprint('articles', __name__, url_prefix='/article')
 
@@ -99,26 +99,7 @@ def post_article():
 @ARTICLES_BP.route('/', methods=['PATCH'])
 @login_required
 def put_article():
-    body = request.get_json(silent=True)
-
-    if not body:
-        return response("Invalid or empty request body", ok=False), 400
-
-    _id = body.get('_id')
-    if _id is None:
-        return response("_id field invalid", ok=False), 400
-
-    try:
-        article = Article.get_one(_id)
-    except ValueError:
-        return response(f'Bad article id: {_id}', ok=False), 400
-
-    try:
-        article.update(**body)
-    except ValueError as e:
-        return response(message=f"Error in validation: {e}", ok=False), 400
-
-    return jsonify({"ok": True, "data": article.to_json()}), 200
+    return patch(Article)
 
 
 @ARTICLES_BP.route('/categories/', methods=['GET'])

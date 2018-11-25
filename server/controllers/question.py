@@ -15,7 +15,14 @@ class QuestionController:
         if self.owner:
             return self.get_by_owner()
 
-        return Question.get_many(**self.args)
+        result = []
+        for question in Question.get_many(**self.args):
+            question = question.to_json()
+            question['article'] = \
+                Article.get_one(question.pop('article_id')).to_json()
+            result.append(question)
+
+        return result
 
     def get_by_owner(self):
         account = Account.get_one(self.owner)

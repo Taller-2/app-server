@@ -69,3 +69,21 @@ def get_shared_server_auth_header():
     encoded = jwt.encode({'name': app_server_name, 'exp': expiration},
                          app_server_secret, algorithm='HS256')
     return {'X-Auth-App': encoded}
+
+
+def patch(model: Type[Model]):
+    body = request.get_json(silent=True)
+    if not body:
+        return response("Invalid or empty request body", ok=False), 400
+    _id = body.get('_id')
+    if _id is None:
+        return response("_id field invalid", ok=False), 400
+    try:
+        instance = model.get_one(_id)
+    except ValueError:
+        return response(f'Bad article id: {_id}', ok=False), 400
+    try:
+        instance.update(**body)
+    except ValueError as e:
+        return response(message=f"Error in validation: {e}", ok=False), 400
+    return jsonify({"ok": True, "data": instance.to_json()}), 200
