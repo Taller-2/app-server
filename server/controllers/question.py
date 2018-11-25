@@ -15,13 +15,16 @@ class QuestionController:
         if self.owner:
             return self.get_by_owner()
 
+        queryset = Question.get_many(**self.args)
+        return self.append_article_to_questions(queryset)
+
+    def append_article_to_questions(self, queryset):
         result = []
-        for question in Question.get_many(**self.args):
+        for question in queryset:
             question = question.to_json()
             question['article'] = \
                 Article.get_one(question.pop('article_id')).to_json()
             result.append(question)
-
         return result
 
     def get_by_owner(self):
@@ -33,4 +36,4 @@ class QuestionController:
             questions.extend(
                 Question.get_many(article_id=article_id)
             )
-        return questions
+        return self.append_article_to_questions(questions)
