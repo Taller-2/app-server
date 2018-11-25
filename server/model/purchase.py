@@ -41,8 +41,11 @@ class Purchase(Model):
 
     @classmethod
     def get_by_seller(cls, seller: Account):
-        article_ids = [a.to_json()['_id'] for a in
+        article_ids = [a.get_id() for a in
                        Article.get_many(user=seller['user_id'])]
+        if not article_ids:
+            return []
+
         purchases = cls.get_many(article_id=article_ids)
         return cls.expand(purchases)
 
