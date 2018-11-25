@@ -19,7 +19,8 @@ class QuestionController:
 
     def get_by_owner(self):
         account = Account.get_one(self.owner)
-        article_ids = [a.get_id() for a in Article.get_many(user=account['user_id'])]
+        article_ids = [a.get_id()
+                       for a in Article.get_many(user=account['user_id'])]
         questions = []
         for article_id in article_ids:
             questions.extend(
