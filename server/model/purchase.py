@@ -18,6 +18,10 @@ class Purchase(Model):
     def get_for_user(cls, user: Account):
         user_id = user.get_id()
         purchases = cls.get_many(user_id=user_id)
+        return cls.expand(purchases)
+
+    @classmethod
+    def expand(cls, purchases):
         result = []
         for purchase in purchases:
             purchase = purchase.to_json()
@@ -34,6 +38,13 @@ class Purchase(Model):
     def purchaser(self) -> Optional[Account]:
         accounts = Account.get_many(user_id=self['user_id'])
         return accounts[0] if accounts else None
+
+    @classmethod
+    def get_by_seller(cls, seller: Account):
+        article_ids = [a.to_json()['_id'] for a in
+                       Article.get_many(user=seller['user_id'])]
+        purchases = cls.get_many(article_id=article_ids)
+        return cls.expand(purchases)
 
     def save(self):
         is_new = self.is_new_instance()

@@ -32,6 +32,7 @@ def create_app(conf='conf.local.Config'):
     from server.routes.chat_messages import CHAT_MESSAGES_BP
     from server.routes.purchases import PURCHASES_BP
     from server.routes.questions import QUESTIONS_BP
+    from server.routes.sales import SALES_BP
 
     app.register_blueprint(EXAMPLE_BP)
     app.register_blueprint(PING_BP)
@@ -41,7 +42,7 @@ def create_app(conf='conf.local.Config'):
     app.register_blueprint(CHAT_MESSAGES_BP)
     app.register_blueprint(PURCHASES_BP)
     app.register_blueprint(QUESTIONS_BP)
-
+    app.register_blueprint(SALES_BP)
     # use the modified encoder class to handle ObjectId and Datetime object
     # while jsonifying the response
     app.json_encoder = JSONEncoder
