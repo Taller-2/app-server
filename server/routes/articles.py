@@ -49,10 +49,6 @@ def get_single_article(_id):
 @login_required
 def shipment_cost(_id):
     args = request.args
-    payment_method = args.get('payment_method')
-    if not payment_method:
-        return response(message=f"payment_method missing",
-                        ok=False), 400
     lat = args.get('my_lat')
     lon = args.get('my_lon')
     if not (lat and lon):
@@ -70,14 +66,29 @@ def shipment_cost(_id):
         return response(message=str(e), ok=False), 400
     if not article:
         return response(message=f"Article {_id} not found", ok=False), 400
-    cost_response = shared_server.shipment_cost(
-        article, lat, lon, payment_method
+    cash_response = shared_server.shipment_cost(
+        article, lat, lon, 'cash'
     )
-    data = cost_response.json()
+    credit_response = shared_server.shipment_cost(
+        article, lat, lon, 'credit'
+    )
+    debit_response = shared_server.shipment_cost(
+        article, lat, lon, 'debit'
+    )
+    cash_data = cash_response.json()
+    credit_data = credit_response.json()
+    debit_data = debit_response.json()
+    ok = cash_data["success"]
+    ok = ok and credit_data["success"]
+    ok = ok and debit_data["success"]
     return jsonify({
-        'ok': data["success"],
-        'data': data["cost"]
-    }), cost_response.status_code
+        'ok': ok,
+        'data': {
+            'cash': cash_data["cost"],
+            'credit': credit_data["cost"],
+            'debit': debit_data["cost"]
+        }
+    }), 200 if ok else 500
 
 
 @ARTICLES_BP.route('/', methods=['GET'])

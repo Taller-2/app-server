@@ -1,10 +1,9 @@
+import os
+from datetime import datetime, timedelta
 from typing import Callable, Sequence, Type
 
-from datetime import datetime, timedelta
-
-from flask import request, jsonify
-
 import jwt
+from flask import request, jsonify
 
 from server.model.base import Model
 
@@ -37,7 +36,8 @@ def find_all(cls: Type[Model],
 
 def create(cls: Type[Model],
            optional_fields: Sequence[str] = None,
-           additional_fields: dict = None):
+           additional_fields: dict = None,
+           after_save=None):
     body = request.get_json(silent=True)
 
     if not body:
@@ -57,17 +57,20 @@ def create(cls: Type[Model],
         return response(message=f"Error in validation: {e}", ok=False), 400
 
     _id = instance.save()
+    if after_save:
+        after_save(instance)
     return jsonify({"ok": True, "_id": _id}), 200
 
 
 def get_shared_server_auth_header():
-    # Set this values in some config file
-    app_server_name = 'app1'
-    app_server_secret = 'S3cret'
-
-    expiration = datetime.utcnow() + timedelta(minutes=1)
-    encoded = jwt.encode({'name': app_server_name, 'exp': expiration},
-                         app_server_secret, algorithm='HS256')
+    encoded = jwt.encode(
+        {
+            'name': os.environ.get('APP_SERVER_NAME'),
+            'exp': datetime.utcnow() + timedelta(minutes=1)
+        },
+        os.environ.get('APP_SERVER_SECRET'),
+        algorithm='HS256'
+    )
     return {'X-Auth-App': encoded}
 
 
