@@ -311,22 +311,6 @@ def test_get_single_article(client):
     assert resp.json['_id'] == _id
 
 
-def test_shipment_cost_no_payment_method(client):
-    article_id = Article({
-        'name': fake.word(),
-        'description': fake.sentence(),
-        'available_units': fake.pyint(),
-        'price': 20.0,
-        'latitude': 0.0,
-        'longitude': 0.0,
-        'user': fake.word(),
-    }).save()
-    response = client.get(f'/article/{article_id}/shipment_cost/?'
-                          f'my_lat=0&my_lon=0')
-    assert response.status_code == 400
-    assert not response.json['ok']
-
-
 def test_shipment_cost_no_coordinates(client):
     article_id = Article({
         'name': fake.word(),
