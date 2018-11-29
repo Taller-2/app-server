@@ -388,7 +388,11 @@ def test_shipment_cost(client):
         my_response_json_data = json.dumps(response.json['data'],
                                            sort_keys=True)
         assert response.json['ok']
-        assert my_response_json_data == shared_server_response_json_data
+        assert my_response_json_data == json.dumps({
+            "cash": {"cost": 12.0, "status": "enabled"},
+            "credit": {"cost": 12.0, "status": "enabled"},
+            "debit": {"cost": 12.0, "status": "enabled"}
+        }, sort_keys=True)
 
 
 def test_get_single_article_bad_id(client):
