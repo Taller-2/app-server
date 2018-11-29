@@ -3,7 +3,7 @@ from datetime import datetime, timedelta
 from typing import Callable, Sequence, Type
 
 import jwt
-from flask import request, jsonify
+from flask import request, jsonify, current_app
 
 from server.model.base import Model
 
@@ -63,6 +63,8 @@ def create(cls: Type[Model],
 
 
 def get_shared_server_auth_header():
+    if current_app.config['SKIP_AUTH']:
+        return {'X-Auth-App': 'a mock'}
     encoded = jwt.encode(
         {
             'name': os.environ.get('APP_SERVER_NAME'),

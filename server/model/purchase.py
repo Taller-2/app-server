@@ -12,7 +12,7 @@ class Purchase(Model):
         'user_id': str,
         'article_id': str,
         'units': int,
-        'requested_shipment': bool
+        'requested_shipment': Optional[bool]
     }
 
     @classmethod
