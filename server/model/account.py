@@ -16,7 +16,8 @@ class Account(Model):
         'name': str,
         'profile_picture_url': Optional[str],
         'created_at': Optional[datetime],
-        'score': Optional[float]
+        'score': Optional[float],
+        'instance_id': Optional[str],
     }
 
     def to_json(self):
