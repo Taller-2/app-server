@@ -54,3 +54,7 @@ def create_shipment(transaction_id: int, address: str):
         'transactionId': transaction_id,
         'address': address
     })
+
+
+def status(purchase_id):
+    return request('GET', f'payments/status-for-purchase/{purchase_id}')

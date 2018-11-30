@@ -5,6 +5,7 @@ from server.model.account import Account
 from server.model.article import Article
 from server.model.purchase import Purchase
 from server.model.user import user_id
+from server.shared_server import shared_server
 from server.shared_server.shared_server import create_payment, create_shipment
 from server.utils import response, create
 
@@ -15,7 +16,18 @@ PURCHASES_BP = Blueprint('purchases', __name__, url_prefix='/purchase')
 @login_required
 def get_purchases():
     user = Account.current()
-    return jsonify({'data': Purchase.get_for_user(user), 'ok': True}), 200
+    purchases = Purchase.get_for_user(user)
+    data = []
+    for purchase in purchases:
+        _response = shared_server.status(purchase['_id']).json()
+        if not _response['success']:
+            return response(f"shared server: {_response['error']}", ok=False),\
+                   400
+        data.append({**purchase, **{
+            'payment_status': _response['payment_status'],
+            'shipment_status': _response['shipment_status']
+        }})
+    return jsonify({'data': data, 'ok': True}), 200
 
 
 def after_purchase(price, payment_method, address):
