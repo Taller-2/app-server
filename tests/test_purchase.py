@@ -1,5 +1,6 @@
 import json
 import random
+from unittest import mock
 
 from faker import Faker
 
@@ -17,32 +18,34 @@ def test_get_user_purchases(client):
 
 
 def test_post_purchase(client, article):
-    resp = client.post('/purchase/', data=json.dumps({
-        "article_id": article.get_id(),
-        "units": article['available_units'],
-        "price": 1000,
-        "payment_method": "cash"
-    }), content_type='application/json')
+    with mock.patch('server.shared_server.shared_server.request'):
+        resp = client.post('/purchase/', data=json.dumps({
+            "article_id": article.get_id(),
+            "units": article['available_units'],
+            "price": 1000,
+            "payment_method": "cash"
+        }), content_type='application/json')
 
-    assert resp.status_code == 200
+        assert resp.status_code == 200
 
-    resp = client.get('/purchase/')
-    assert resp.status_code == 200
-    article = article.to_json()
-    resp_article = resp.json['data'][0]['article']
-    for key in article:
-        if key == 'available_units':
-            assert resp_article[key] == 0  # all units were bought
-        else:
-            assert resp_article[key] == article[key]
+        resp = client.get('/purchase/')
+        assert resp.status_code == 200
+        article = article.to_json()
+        resp_article = resp.json['data'][0]['article']
+        for key in article:
+            if key == 'available_units':
+                assert resp_article[key] == 0  # all units were bought
+            else:
+                assert resp_article[key] == article[key]
 
 
 def test_post_bad_article(client):
-    resp = client.post('/purchase/', data=json.dumps({
-        "units": 1,
-    }), content_type='application/json')
+    with mock.patch('server.shared_server.shared_server.request'):
+        resp = client.post('/purchase/', data=json.dumps({
+            "units": 1,
+        }), content_type='application/json')
 
-    assert resp.status_code == 400
+        assert resp.status_code == 400
 
 
 def test_first_save_registers_sale():
