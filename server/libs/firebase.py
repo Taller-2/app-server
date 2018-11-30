@@ -1,6 +1,6 @@
 import firebase_admin
 from firebase_admin import credentials, messaging
-from flask import current_app, g
+from flask import current_app
 
 from server.model.account import Account
 
