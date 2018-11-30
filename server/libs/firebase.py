@@ -1,6 +1,6 @@
 import firebase_admin
 from firebase_admin import credentials, messaging
-from flask import current_app
+from flask import current_app, g
 
 from server.model.account import Account
 
@@ -8,16 +8,13 @@ API_KEY_PATH = "apikey.json"
 
 
 class FirebaseMessage:
-    client = None
-
     def __init__(self, title: str, message: str, to: Account):
         self.title = title
         self.message = message
         self.recipient = to
 
     def send(self):
-        if self.client is None:
-            self.init_firebase()
+        self.init_firebase()
 
         registration_token = self.recipient['instance_id']
 
@@ -39,4 +36,7 @@ class FirebaseMessage:
             f.write(api_key)
 
         cred = credentials.Certificate(API_KEY_PATH)
-        firebase_admin.initialize_app(cred)
+        try:
+            firebase_admin.initialize_app(cred)
+        except ValueError:
+            pass
