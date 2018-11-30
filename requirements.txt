@@ -19,4 +19,4 @@ haversine
 PyJWT
 freezegun==0.3.11
 requests-mock==1.5.2
-firebase-   admin
+firebase-admin
