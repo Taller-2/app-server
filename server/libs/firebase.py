@@ -12,9 +12,8 @@ logger = get_root_logger("Firebase")
 
 
 class FirebaseMessage:
-    def __init__(self, title: str, message: str, to: Account):
-        self.title = title
-        self.message = message
+    def __init__(self, message_data: dict, to: Account):
+        self.data = message_data
         self.recipient = to
 
     def send(self):
@@ -30,15 +29,12 @@ class FirebaseMessage:
 
         # See documentation on defining a message payload.
         firebase_message = messaging.Message(
-            data={
-                'title': self.title,
-                'message': self.message,
-            },
+            data=self.data,
             token=registration_token,
         )
         logger.info("Sending Firebase message: "
-                    "title: %s, message %s, token %s",
-                    self.title, self.message, registration_token)
+                    "data %s, token %s",
+                    self.data, registration_token)
 
         messaging.send(firebase_message)
 

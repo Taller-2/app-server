@@ -48,6 +48,8 @@ def send_firebase_message(message_id, purchase_id):
     else:
         sender = buyer
         recipient = seller
-    FirebaseMessage(title=sender['name'],
-                    message=message['text'],
+    FirebaseMessage(message_data={
+        'title': sender['name'],
+        'message': message['text'],
+        'purchase_id': purchase_id},
                     to=recipient).send()
