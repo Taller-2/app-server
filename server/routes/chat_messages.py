@@ -1,6 +1,7 @@
 from flask import Blueprint, request
 
 from server import utils
+from server.decorators.login_required import login_required
 from server.libs.firebase import FirebaseMessage
 from server.model.account import Account
 from server.model.chat_message import ChatMessage
@@ -17,10 +18,15 @@ def find_all(room_id):
 
 
 @CHAT_MESSAGES_BP.route('/<room_id>/', methods=['POST'])
+@login_required
 def create(room_id):
     purchase_id = request.get_json(silent=True).get('purchase_id')
+    account = Account.current()
     response, status_code = \
-        utils.create(ChatMessage, additional_fields={'room': room_id})
+        utils.create(ChatMessage,
+                     additional_fields={'room': room_id,
+                                        'name': account['name'],
+                                        'sender_user_id': account.get_id()})
 
     if status_code == 200 and purchase_id is not None:
         send_firebase_message(response.json['_id'], purchase_id)
@@ -33,7 +39,7 @@ def send_firebase_message(message_id, purchase_id):
     # Sends a firebase message, to the inferred recipient
     message = ChatMessage.get_one(message_id)
 
-    sender_id = ['sender_user_id']
+    sender_id = message['sender_user_id']
     purchase = Purchase.get_one(purchase_id)
     seller = purchase.seller()
     buyer = Account.get_one(purchase['user_id'])
@@ -45,4 +51,4 @@ def send_firebase_message(message_id, purchase_id):
         recipient = seller
     FirebaseMessage(title=sender['name'],
                     message=message['text'],
-                    to=recipient)
+                    to=recipient).send()
