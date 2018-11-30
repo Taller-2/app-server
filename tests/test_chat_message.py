@@ -1,4 +1,7 @@
 import json
+from unittest import mock
+
+from server.model.chat_message import ChatMessage
 
 
 def test_create_missing_text(client):
@@ -69,3 +72,16 @@ def test_multiple_chat_rooms(client):
     assert resp.json['data'][0]['text'] == other_text
     assert resp.json['data'][0]['name'] == other_name
     assert resp.json['data'][0]['sender_user_id'] == other_sender_user_id
+
+
+def test_send_with_purchase_id(client, purchase):
+    with mock.patch('server.routes.chat_messages.send_firebase_message'):
+        resp = client.post('/chat_message/test_room/', data=json.dumps({
+            'text': 'test',
+            'name': 'name test',
+            'sender_user_id': 'user_id test',
+            'purchase_id': purchase.get_id(),
+        }), content_type='application/json')
+
+    assert resp.status_code == 200
+    assert len(ChatMessage.get_many()) == 1
