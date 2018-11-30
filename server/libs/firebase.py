@@ -14,7 +14,8 @@ class FirebaseMessage:
         self.recipient = to
 
     def send(self):
-        self.init_firebase()
+        if not self.is_firebase_initialized():
+            self.init_firebase()
 
         registration_token = self.recipient['instance_id']
 
@@ -36,7 +37,13 @@ class FirebaseMessage:
             f.write(api_key)
 
         cred = credentials.Certificate(API_KEY_PATH)
+        firebase_admin.initialize_app(cred)
+
+
+    @staticmethod
+    def is_firebase_initialized():
         try:
-            firebase_admin.initialize_app(cred)
+            firebase_admin.get_app()
+            return True
         except ValueError:
-            pass
+            return False

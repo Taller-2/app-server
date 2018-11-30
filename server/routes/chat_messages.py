@@ -35,7 +35,6 @@ def create(room_id):
 
 def send_firebase_message(message_id, purchase_id):
     # ☢️☢️☢️☢️☢️
-    # This is the worst code on this project
     # Sends a firebase message, to the inferred recipient
     message = ChatMessage.get_one(message_id)
 
