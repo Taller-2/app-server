@@ -4,6 +4,7 @@ from faker import Faker
 from server.app import create_app
 from server.libs.mongo import mongo
 from server.model.article import Article
+from server.model.purchase import Purchase
 
 fake = Faker()
 
@@ -25,7 +26,13 @@ def client():
 
 @pytest.fixture
 def article():
-    art = Article({
+    art = generate_article()
+    yield art
+    art.delete()
+
+
+def generate_article():
+    instance = Article({
         "name": fake.pystr(),
         "description": fake.text(),
         "available_units": fake.pyint(),
@@ -34,6 +41,18 @@ def article():
         "longitude": fake.pyfloat(),
         "user": fake.pystr(),
     })
-    art.save()
-    yield art
-    art.delete()
+    instance.save()
+    return instance
+
+
+@pytest.fixture
+def purchase():
+    article = generate_article()
+    instance = Purchase({
+        "article_id": article.get_id(),
+        "user_id": fake.pystr(),
+        "units": fake.pyint(),
+    })
+    instance.save()
+    yield instance
+    instance.delete()
