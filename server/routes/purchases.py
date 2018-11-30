@@ -28,27 +28,41 @@ def after_purchase(price, payment_method, address):
     return callback
 
 
-@PURCHASES_BP.route('/', methods=['POST'])
-@login_required
-def buy():
-    body = request.json
+def check_required_fields(body):
     if body is None:
         return response("Request body is null", ok=False), 400
-
     if not body.get('units'):
         return response("units not specified", ok=False), 400
     if not body.get('price'):
         return response("price not specified", ok=False), 400
     if not body.get('payment_method'):
         return response("payment_method not specified", ok=False), 400
+    return None
 
+
+def get_article(body):
     article_id = body.get('article_id')
     try:
         article = Article.get_one(article_id)
         if article is None:
-            return response("article ID {article_id} not found", ok=False), 400
+            return None, response("article was not found", ok=False), 400
     except ValueError:
-        return response(f"article_id not specified", ok=False), 400
+        return None, response(f"article_id not specified", ok=False), 400
+    return article, None
+
+
+@PURCHASES_BP.route('/', methods=['POST'])
+@login_required
+def buy():
+    body = request.json
+
+    error_response = check_required_fields(body)
+    if error_response:
+        return error_response
+
+    article, error_response = get_article(body)
+    if error_response:
+        return error_response
 
     account_id = Account.current().get_id()
 
@@ -60,10 +74,13 @@ def buy():
         return response("not enough units", ok=False), 400
     article.save()
 
-    body['user_id'] = account_id
-    body['requested_shipment'] = bool(body.get('shipment_address'))
-    return create(Purchase,
-                  additional_fields={'user_id': account_id},
-                  after_save=after_purchase(body.get('price'),
-                                            body.get('payment_method'),
-                                            body.get('shipment_address')))
+    return create(
+        Purchase,
+        additional_fields={
+            'user_id': account_id,
+            'requested_shipment': bool(body.get('shipment_address'))
+        },
+        after_save=after_purchase(body.get('price'),
+                                  body.get('payment_method'),
+                                  body.get('shipment_address'))
+    )

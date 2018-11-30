@@ -78,17 +78,17 @@ def shipment_cost(_id):
     cash_data = cash_response.json()
     credit_data = credit_response.json()
     debit_data = debit_response.json()
-    ok = cash_data["success"]
-    ok = ok and credit_data["success"]
-    ok = ok and debit_data["success"]
+    success = cash_data["success"]
+    success = success and credit_data["success"]
+    success = success and debit_data["success"]
     return jsonify({
-        'ok': ok,
+        'ok': success,
         'data': {
             'cash': cash_data["cost"],
             'credit': credit_data["cost"],
             'debit': debit_data["cost"]
         }
-    }), 200 if ok else 500
+    }), 200 if success else 500
 
 
 @ARTICLES_BP.route('/', methods=['GET'])
