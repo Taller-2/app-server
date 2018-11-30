@@ -32,7 +32,7 @@ def article():
 
 
 def generate_article():
-    art = Article({
+    instance = Article({
         "name": fake.pystr(),
         "description": fake.text(),
         "available_units": fake.pyint(),
@@ -41,18 +41,18 @@ def generate_article():
         "longitude": fake.pyfloat(),
         "user": fake.pystr(),
     })
-    art.save()
-    return art
+    instance.save()
+    return instance
 
 
 @pytest.fixture
 def purchase():
     article = generate_article()
-    pur = Purchase({
+    instance = Purchase({
         "article_id": article.get_id(),
         "user_id": fake.pystr(),
         "units": fake.pyint(),
     })
-    pur.save()
-    yield pur
-    pur.delete()
+    instance.save()
+    yield instance
+    instance.delete()
