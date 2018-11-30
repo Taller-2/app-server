@@ -39,7 +39,6 @@ class FirebaseMessage:
         cred = credentials.Certificate(API_KEY_PATH)
         firebase_admin.initialize_app(cred)
 
-
     @staticmethod
     def is_firebase_initialized():
         try:
