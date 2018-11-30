@@ -22,6 +22,11 @@ class FirebaseMessage:
             self.init_firebase()
 
         registration_token = self.recipient['instance_id']
+        if registration_token is None:
+            msg = "Account instance id is None, skipping firebase message. " \
+                  "User %s"
+            logger.info(msg, self.recipient.get_id())
+            return
 
         # See documentation on defining a message payload.
         firebase_message = messaging.Message(
