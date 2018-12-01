@@ -4,6 +4,7 @@ from flask import request, Blueprint, jsonify
 
 from server.controllers.article import ArticleController
 from server.decorators.login_required import login_required
+from server.libs.firebase import FirebaseMessage
 from server.model.account import Account
 from server.model.article import Article
 from server.model.question import Question
@@ -145,10 +146,22 @@ def create_question(_id):
     if not article:
         return response(message=f"Article {_id} not found", ok=False), 400
 
-    return create(Question,
-                  additional_fields={'created_at': datetime.utcnow(),
-                                     'article_id': _id,
-                                     'user_id': Account.current().get_id()})
+    account = Account.current()
+    resp, status_code = create(
+        Question,
+        additional_fields={'created_at': datetime.utcnow(),
+                           'article_id': _id,
+                           'user_id': account.get_id()})
+
+    if status_code == 200:
+        question = Question.get_one(resp.json['_id'])
+        FirebaseMessage({
+            'title': f'Nueva pregunta de {account["name"]}',
+            'message': f'{question["question"]}',
+            'type': 'new_question'
+        }, to=article.account()).send()
+
+    return resp, status_code
 
 
 @ARTICLES_BP.route('/<article_id>/question/<question_id>/', methods=['POST'])
@@ -179,4 +192,11 @@ def answer_question(article_id, question_id):
     answered_at = datetime.utcnow()
 
     question.update(**{'answer': answer, 'answered_at': answered_at})
+    account = Account.current()
+    FirebaseMessage({
+        'title': f'Nueva respuesta de {account["name"]}',
+        'message': f'{question["answer"]}',
+        'type': 'new_answer'
+    }, to=Account.get_one(question['user_id'])).send()
+
     return jsonify({"ok": True, "data": question.to_json()}), 200

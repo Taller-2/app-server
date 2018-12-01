@@ -1,6 +1,7 @@
 from flask import Blueprint, request, jsonify
 
 from server.decorators.login_required import login_required
+from server.libs.firebase import FirebaseMessage
 from server.model.account import Account
 from server.model.article import Article
 from server.model.purchase import Purchase
@@ -76,7 +77,8 @@ def buy():
     if error_response:
         return error_response
 
-    account_id = Account.current().get_id()
+    account = Account.current()
+    account_id = account.get_id()
 
     if user_id() == article['user']:
         return response("You can't purchase your own article", ok=False), 400
@@ -86,7 +88,7 @@ def buy():
         return response("not enough units", ok=False), 400
     article.save()
 
-    return create(
+    resp, status_code = create(
         Purchase,
         additional_fields={
             'user_id': account_id,
@@ -96,3 +98,14 @@ def buy():
                                   body.get('payment_method'),
                                   body.get('shipment_address'))
     )
+
+    if status_code == 200:
+        msg = f'Vendiste {body.get("units")} de ' \
+              f'{article["name"]} a {account["name"]})'
+        FirebaseMessage({
+            'title': "Artículo vendido",
+            "message": msg,
+            "type": "product_sold",
+        }, to=Purchase.get_one(resp.json['_id']).seller()).send()
+
+    return resp, status_code
