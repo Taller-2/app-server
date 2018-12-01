@@ -1,8 +1,10 @@
 from datetime import datetime
 from typing import Optional
 
+import pymongo
 from dateutil.relativedelta import relativedelta
 
+from server.model.account_event import AccountEvent
 from server.model.base import Model
 from server.model.user import user_id
 
@@ -45,10 +47,23 @@ class Account(Model):
     def score(self) -> float:
         return self['score'] or 0
 
-    def register(self, event: str):
+    def register(self, event: str, article_name: str):
         increment = {
             'publication': 1,
             'purchase': 5,
             'sale': 10,
         }[event]
         self.update(score=self.score() + increment)
+        AccountEvent({
+            'account_id': self.get_id(),
+            'type': event,
+            'article_name': article_name,
+            'timestamp': datetime.utcnow(),
+            'score_increment': increment
+        }).save()
+
+    def events(self):
+        return AccountEvent.get_many(
+            account_id=self.get_id(),
+            sort_by=[('timestamp', pymongo.DESCENDING)]
+        )

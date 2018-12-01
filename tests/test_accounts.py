@@ -66,19 +66,19 @@ def test_score():
 def test_register_publication():
     _account = account({'score': random.randint(0, 100)})
     previous_score = _account.score()
-    _account.register('publication')
+    _account.register('publication', 'article_name')
     assert Account.get_one(_account.get_id()).score() == previous_score + 1
 
 
 def test_register_purchase():
     _account = account({'score': random.randint(0, 100)})
     previous_score = _account.score()
-    _account.register('purchase')
+    _account.register('purchase', 'article_name')
     assert Account.get_one(_account.get_id()).score() == previous_score + 5
 
 
 def test_register_sale():
     _account = account({'score': random.randint(0, 100)})
     previous_score = _account.score()
-    _account.register('sale')
+    _account.register('sale', 'article_name')
     assert Account.get_one(_account.get_id()).score() == previous_score + 10

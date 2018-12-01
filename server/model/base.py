@@ -13,7 +13,7 @@ class Model:
     # Mongodb database name. Try to keep this unique between models!
     db_name = None
 
-    # Special formatting to give fields during JSON serializatiom.
+    # Special formatting to give fields during JSON serialization.
     # Keys: field names, values: callable to format (returns string)
     field_formats = {}
 
@@ -69,15 +69,14 @@ class Model:
         return mongo.db[self.db_name].delete_one({'_id': self._id})
 
     @classmethod
-    def get_many(cls, *_, **kwargs) -> list:
+    def get_many(cls, *_, sort_by: list = None, **kwargs) -> list:
         mongo_query = cls.make_mongo_query(kwargs)
-
-        return cls.run_query(mongo_query)
+        return cls.run_query(mongo_query, sort=sort_by)
 
     @classmethod
-    def run_query(cls, mongo_query):
+    def run_query(cls, mongo_query, sort=None):
         models = []
-        results = mongo.db[cls.db_name].find(mongo_query)
+        results = mongo.db[cls.db_name].find(mongo_query, sort=sort)
         for result in results:
             model = cls(result)
             model._id = result['_id']
@@ -87,7 +86,6 @@ class Model:
     @classmethod
     def make_mongo_query(cls, filters: dict) -> dict:
         """
-
         Generates an AND of several ORs of the params given by the
         filters dict
         filters schema: {

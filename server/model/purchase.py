@@ -9,7 +9,7 @@ class Purchase(Model):
     db_name = 'purchases'
 
     schema = {
-        'user_id': str,
+        'user_id': str,  # it's actually account_id!
         'article_id': str,
         'units': int,
         'requested_shipment': Optional[bool]
@@ -33,12 +33,14 @@ class Purchase(Model):
         return result
 
     def seller(self) -> Optional[Account]:
-        article = Article.get_one(self['article_id'])
+        article = self.article()
         return article.account() if article else None
 
+    def article(self) -> Optional[Article]:
+        return Article.get_one(self['article_id'])
+
     def purchaser(self) -> Optional[Account]:
-        accounts = Account.get_many(user_id=self['user_id'])
-        return accounts[0] if accounts else None
+        return Account.get_one(self['user_id'])
 
     @classmethod
     def get_by_seller(cls, seller: Account):
@@ -55,10 +57,11 @@ class Purchase(Model):
         _id = super(Purchase, self).save()
         if not is_new:
             return _id
-        seller = self.seller()
+        article = self.article()
+        seller = article.account()
         purchaser = self.purchaser()
         if seller:
-            seller.register('sale')
+            seller.register('sale', article['name'])
         if purchaser:
-            purchaser.register('purchase')
+            purchaser.register('purchase', article['name'])
         return _id

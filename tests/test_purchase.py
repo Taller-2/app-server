@@ -10,6 +10,8 @@ from server.model.purchase import Purchase
 
 fake = Faker()
 
+user_id = '5c02f0a28b06dfc832066592'
+
 
 def test_get_user_purchases(client):
     resp = client.get('/purchase/')
@@ -53,7 +55,6 @@ def test_first_save_registers_sale():
     for purchase in Purchase.get_many():
         purchase.delete()
     score = random.randint(0, 100)
-    user_id = 'seller'
     seller_id = Account({
         'user_id': user_id,
         'email': fake.email(),
@@ -71,7 +72,7 @@ def test_first_save_registers_sale():
     }).save()
     score = Account.get_one(seller_id).score()
     purchase_id = Purchase({
-        'user_id': 'something',
+        'user_id': user_id,
         'article_id': article_id,
         'units': 1
     }).save()
@@ -88,7 +89,6 @@ def test_first_save_registers_purchase():
     for purchase in Purchase.get_many():
         purchase.delete()
     score = random.randint(0, 100)
-    user_id = 'purchaser'
     purchaser_id = Account({
         'user_id': user_id,
         'email': fake.email(),
@@ -105,7 +105,7 @@ def test_first_save_registers_purchase():
         'user': 'someone else',
     }).save()
     purchase_id = Purchase({
-        'user_id': user_id,
+        'user_id': purchaser_id,
         'article_id': article_id,
         'units': 1
     }).save()

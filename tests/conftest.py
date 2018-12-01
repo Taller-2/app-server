@@ -5,6 +5,7 @@ from server.app import create_app
 from server.libs.mongo import mongo
 from server.model.article import Article
 from server.model.purchase import Purchase
+from tests import test_purchase
 
 fake = Faker()
 
@@ -50,7 +51,7 @@ def purchase():
     article = generate_article()
     instance = Purchase({
         "article_id": article.get_id(),
-        "user_id": fake.pystr(),
+        "user_id": test_purchase.user_id,
         "units": fake.pyint(),
     })
     instance.save()

@@ -10,7 +10,14 @@ ACCOUNTS_BP = Blueprint('accounts', __name__, url_prefix='/account')
 @ACCOUNTS_BP.route('/current/', methods=['GET'])
 @login_required
 def current_account():
-    return jsonify({"ok": True, "data": Account.current().to_json()}), 200
+    account = Account.current()
+    return jsonify({
+        "ok": True,
+        "data": {
+            **account.to_json(),
+            **{'events': [event.to_json() for event in account.events()]}
+        }
+    }), 200
 
 
 @ACCOUNTS_BP.route('/current/', methods=['PATCH'])
