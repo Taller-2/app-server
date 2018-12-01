@@ -21,21 +21,22 @@ def test_get_user_purchases(client):
 
 def test_post_purchase(client, article):
     with mock.patch('server.shared_server.shared_server.request'):
-        resp = client.post('/purchase/', data=json.dumps({
-            "article_id": article.get_id(),
-            "units": article['available_units'],
-            "price": 1000,
-            "payment_method": "cash"
-        }), content_type='application/json')
+        with mock.patch('server.libs.firebase.FirebaseMessage.send'):
+            resp = client.post('/purchase/', data=json.dumps({
+                "article_id": article.get_id(),
+                "units": article['available_units'],
+                "price": 1000,
+                "payment_method": "cash"
+            }), content_type='application/json')
 
-        assert resp.status_code == 200
-        resp_article = Article.get_one(article.get_id()).to_json()
-        article = article.to_json()
-        for key in article:
-            if key == 'available_units':
-                assert resp_article[key] == 0  # all units were bought
-            else:
-                assert resp_article[key] == article[key]
+            assert resp.status_code == 200
+            resp_article = Article.get_one(article.get_id()).to_json()
+            article = article.to_json()
+            for key in article:
+                if key == 'available_units':
+                    assert resp_article[key] == 0  # all units were bought
+                else:
+                    assert resp_article[key] == article[key]
 
 
 def test_post_bad_article(client):
