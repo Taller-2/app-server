@@ -27,11 +27,8 @@ def test_post_purchase(client, article):
         }), content_type='application/json')
 
         assert resp.status_code == 200
-
-        resp = client.get('/purchase/')
-        assert resp.status_code == 200
+        resp_article = Article.get_one(article.get_id()).to_json()
         article = article.to_json()
-        resp_article = resp.json['data'][0]['article']
         for key in article:
             if key == 'available_units':
                 assert resp_article[key] == 0  # all units were bought
