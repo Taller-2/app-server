@@ -51,5 +51,6 @@ def send_firebase_message(message_id, purchase_id):
     FirebaseMessage(message_data={
         'title': sender['name'],
         'message': message['text'],
-        'purchase_id': purchase_id},
+        'purchase_id': purchase_id,
+        "type": "chat"},
                     to=recipient).send()
