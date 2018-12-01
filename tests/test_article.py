@@ -311,22 +311,6 @@ def test_get_single_article(client):
     assert resp.json['_id'] == _id
 
 
-def test_shipment_cost_no_payment_method(client):
-    article_id = Article({
-        'name': fake.word(),
-        'description': fake.sentence(),
-        'available_units': fake.pyint(),
-        'price': 20.0,
-        'latitude': 0.0,
-        'longitude': 0.0,
-        'user': fake.word(),
-    }).save()
-    response = client.get(f'/article/{article_id}/shipment_cost/?'
-                          f'my_lat=0&my_lon=0')
-    assert response.status_code == 400
-    assert not response.json['ok']
-
-
 def test_shipment_cost_no_coordinates(client):
     article_id = Article({
         'name': fake.word(),
@@ -388,7 +372,11 @@ def test_shipment_cost(client):
         my_response_json_data = json.dumps(response.json['data'],
                                            sort_keys=True)
         assert response.json['ok']
-        assert my_response_json_data == shared_server_response_json_data
+        assert my_response_json_data == json.dumps({
+            "cash": {"cost": 12.0, "status": "enabled"},
+            "credit": {"cost": 12.0, "status": "enabled"},
+            "debit": {"cost": 12.0, "status": "enabled"}
+        }, sort_keys=True)
 
 
 def test_get_single_article_bad_id(client):
