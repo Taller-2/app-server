@@ -1,7 +1,10 @@
+from unittest import mock
+
 import pytest
 from faker import Faker
 
 from server.app import create_app
+from server.libs.firebase import FirebaseMessage
 from server.libs.mongo import mongo
 from server.model.article import Article
 from server.model.purchase import Purchase
@@ -57,3 +60,9 @@ def purchase():
     instance.save()
     yield instance
     instance.delete()
+
+
+@pytest.fixture(scope='session', autouse=True)
+def my_thing_mock():
+    with mock.patch.object(FirebaseMessage, 'send') as _fixture:
+        yield _fixture
