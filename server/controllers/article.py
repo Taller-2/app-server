@@ -68,16 +68,28 @@ class ArticleController:
         return list(Article.schema.keys()) + self.DISTANCE_ARGS + \
                [self.PRICE_MIN, self.PRICE_MAX, self.NAME_CONTAINS]
 
+    @staticmethod
+    def order_by_score(articles):
+        scored_articles = []
+        for article in articles:
+            score = 0
+            account = article.account()
+            if account:
+                score = account['score']
+            if not score:
+                score = 0
+            scored_articles.append((article, score))
+        scored_articles = sorted(scored_articles,
+                                 key=lambda x: x[1],
+                                 reverse=True)
+        return [article[0] for article in scored_articles]
+
     def get_articles(self) -> Sequence[Article]:
         articles = self.run_query()
-
-        if not self.max_distance:
-            self.save_statistic(articles)
-            return articles
-
-        filtered_articles = self._filter_by_distance(articles)
+        if self.max_distance:
+            articles = self._filter_by_distance(articles)
         self.save_statistic(articles)
-        return filtered_articles
+        return self.order_by_score(articles)
 
     @staticmethod
     def save_statistic(articles: Sequence[Article]):
