@@ -13,22 +13,30 @@ from server.utils import response, create
 PURCHASES_BP = Blueprint('purchases', __name__, url_prefix='/purchase')
 
 
-@PURCHASES_BP.route('/', methods=['GET'])
-@login_required
-def get_purchases():
-    user = Account.current()
-    purchases = Purchase.get_for_user(user)
-    data = []
+def add_payment_and_shipment_status(purchases):
+    purchase_with_status = []
     for purchase in purchases:
         _response = shared_server.status(purchase['_id']).json()
         if not _response['success']:
-            return response(f"shared server: {_response['error']}", ok=False),\
-                   400
-        data.append({**purchase, **{
+            return response(
+                f"shared server: {_response['error']}", ok=False
+            ), 400
+        purchase_with_status.append({**purchase, **{
             'payment_status': _response['payment_status'],
             'shipment_status': _response['shipment_status']
         }})
-    return jsonify({'data': data, 'ok': True}), 200
+    return purchase_with_status
+
+
+@PURCHASES_BP.route('/', methods=['GET'])
+@login_required
+def get_purchases():
+    return jsonify({
+        'data': add_payment_and_shipment_status(
+            Purchase.get_for_user(Account.current())
+        ),
+        'ok': True
+    }), 200
 
 
 def after_purchase(price, payment_method, address):
