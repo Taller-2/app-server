@@ -158,6 +158,7 @@ def create_question(_id):
         FirebaseMessage({
             'title': f'Nueva pregunta de {account["name"]}',
             'message': f'{question["question"]}',
+            'question': question.get_id(),
             'type': 'new_question'
         }, to=article.account()).send()
 
@@ -196,6 +197,7 @@ def answer_question(article_id, question_id):
     FirebaseMessage({
         'title': f'Nueva respuesta de {account["name"]}',
         'message': f'{question["answer"]}',
+        'article_id': article_id,
         'type': 'new_answer'
     }, to=Account.get_one(question['user_id'])).send()
 

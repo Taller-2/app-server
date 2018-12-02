@@ -27,3 +27,12 @@ def get():
 @QUESTIONS_BP.route('/', methods=['PATCH'])
 def patch_question():
     return patch(Question)
+
+
+@QUESTIONS_BP.route("/<_id>/", methods=['GET'])
+def get_one(_id):
+    try:
+        return jsonify(Question.get_one(_id).to_json()), 200
+    except ValueError:
+        return response(message=f"Question {_id} not found",
+                        ok=False), 400
