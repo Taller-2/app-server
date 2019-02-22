@@ -10,14 +10,14 @@ jobs:
           - MONGO_LOG_DIR=/dev/null
 
     steps:
-      - checkout
       - run:
           name: "Setup virtualenv"
           command: |
-            python -m venv venv
+            python -m venv ~/venv
             source venv/bin/activate
             pip install -r requirements.txt
-            echo "source /path/to/virtualenv/bin/activate" >> $BASH_ENV
+            echo "source ~/venv/bin/activate" >> $BASH_ENV
+      - checkout
       - run:
           name: "Run tests"
           command: "sh scripts/tests.sh"
