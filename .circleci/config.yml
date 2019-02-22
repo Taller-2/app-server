@@ -6,9 +6,15 @@ jobs:
       - image: circleci/python:3.6.6
     steps:
       - checkout
-      - run: "sudo pip install -r requirements.txt"
-      - run: "test \"Python 3.6.6\" = \"$(python --version)\""
-      - run: "sh scripts/tests.sh"
+      - run:
+          name: "Setup virtualenv"
+          command: |
+            python -m venv venv
+            source venv/bin/activate
+            pip install -r requirements.txt
+      - run:
+          name: "Run tests"
+          command: "sh scripts/tests.sh"
 workflows:
     "Run unit tests":
         jobs:
