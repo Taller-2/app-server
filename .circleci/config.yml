@@ -14,7 +14,7 @@ jobs:
           name: "Setup virtualenv"
           command: |
             python -m venv ~/venv
-            source venv/bin/activate
+            source ~/venv/bin/activate
             pip install -r requirements.txt
             echo "source ~/venv/bin/activate" >> $BASH_ENV
       - checkout
