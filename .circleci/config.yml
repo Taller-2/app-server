@@ -15,9 +15,11 @@ jobs:
           command: |
             python -m venv ~/venv
             source ~/venv/bin/activate
-            pip install -r requirements.txt
             echo "source ~/venv/bin/activate" >> $BASH_ENV
       - checkout
+      - run:
+          name: "Install dependencies"
+          command: "pip install -r requirements.txt"
       - run:
           name: "Run tests"
           command: "sh scripts/tests.sh"
