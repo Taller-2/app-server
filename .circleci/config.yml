@@ -17,9 +17,17 @@ jobs:
             python -m venv venv
             source venv/bin/activate
             pip install -r requirements.txt
+            echo "source /path/to/virtualenv/bin/activate" >> $BASH_ENV
       - run:
           name: "Run tests"
-          command: ". venv/bin/activate && sh scripts/tests.sh"
+          command: "sh scripts/tests.sh"
+      - run:
+          name: "Run pylint"
+          command: "sh scripts/pylint.sh"
+      - run:
+          name: "Run flake8"
+          command: "sh scripts/flake8.sh"
+
 workflows:
     "Run unit tests":
         jobs:
